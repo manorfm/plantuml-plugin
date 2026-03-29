@@ -4,7 +4,7 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Verdana
 
-title plantuml-viewer v0.10.2 — architecture (this repo)
+title plantuml-viewer v0.10.3 — architecture (this repo)
 
 left to right direction
 

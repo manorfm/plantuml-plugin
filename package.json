@@ -2,7 +2,7 @@
   "name": "plantuml-viewer",
   "displayName": "PlantUML Viewer",
   "description": "Preview PlantUML diagrams (.puml) in the editor with live updates.",
-  "version": "0.10.2",
+  "version": "0.10.3",
   "publisher": "local",
   "license": "MIT",
   "repository": {

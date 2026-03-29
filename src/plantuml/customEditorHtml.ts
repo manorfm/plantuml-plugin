@@ -1,3 +1,5 @@
+import { diagramAreaChromeCss } from "../preview/html";
+
 /**
  * Static HTML document for {@link vscode.CustomTextEditorProvider}.
  * Mode, text, diagram updates via `postMessage`; syntax colouring via highlight layer + `highlight` / `highlightHtml` messages.
@@ -164,6 +166,10 @@ export function getPlantumlCustomEditorShellHtml(): string {
       flex: 1 1 50%;
       flex-direction: column;
       overflow: hidden;
+      background: var(
+        --vscode-sideBar-dropBackground,
+        var(--vscode-editor-background, transparent)
+      );
     }
     body.mode-code #diagramPane { display: none !important; }
     body.mode-preview #codePane { display: none !important; }
@@ -206,76 +212,7 @@ export function getPlantumlCustomEditorShellHtml(): string {
       display: flex;
       flex-direction: column;
     }
-    #diagramMount .wrap {
-      display: flex;
-      flex-direction: column;
-      flex: 1 1 auto;
-      min-height: 0;
-      box-sizing: border-box;
-      padding: 12px;
-    }
-    #diagramMount .scrollport {
-      flex: 1 1 auto;
-      overflow: auto;
-      min-height: 0;
-      cursor: grab;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: none;
-    }
-    #diagramMount .scrollport.grabbing { cursor: grabbing; }
-    #diagramMount .zoom-layer {
-      display: inline-block;
-      transform-origin: 0 0;
-    }
-    #diagramMount .zoom-layer svg {
-      display: block;
-      max-width: none !important;
-      height: auto !important;
-      min-width: min-content;
-      vertical-align: top;
-    }
-    #diagramMount .zoom-layer svg text,
-    #diagramMount .zoom-layer svg tspan {
-      paint-order: stroke fill;
-    }
-    #diagramMount .error {
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
-      font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
-      color: var(--vscode-errorForeground);
-      max-width: 100%;
-    }
-    #diagramMount .loading {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      font-size: var(--vscode-font-size, 13px);
-      color: var(
-        --vscode-descriptionForeground,
-        var(--vscode-editor-foreground)
-      );
-    }
-    #diagramMount .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid
-        var(
-          --vscode-input-border,
-          var(--vscode-panel-border, var(--vscode-widget-border, rgba(128, 128, 128, 0.45)))
-        );
-      border-top-color: var(
-        --vscode-progressBar-background,
-        var(--vscode-button-background, var(--vscode-focusBorder))
-      );
-      border-radius: 50%;
-      animation: pumlSpin 0.8s linear infinite;
-    }
-    @keyframes pumlSpin {
-      to { transform: rotate(360deg); }
-    }
+    ${diagramAreaChromeCss("#diagramMount")}
   `.trim();
 
   const panScript = `(function(){

@@ -36,6 +36,136 @@ export function escapeHtml(text: string): string {
 }
 
 /**
+ * Estilos partilhados da área do diagrama (custom editor `#diagramMount` ou painel `.puml-preview-body`).
+ * Não altera a estrutura DOM — só aparência (cartão, sombras, loading e erros).
+ */
+export function diagramAreaChromeCss(scope: string): string {
+  return `
+    ${scope} .wrap {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-height: 0;
+      box-sizing: border-box;
+      padding: 10px 14px 14px;
+    }
+    ${scope} .wrap .scrollport {
+      flex: 1 1 auto;
+      overflow: auto;
+      min-height: 0;
+      cursor: grab;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: none;
+      border-radius: 10px;
+      border: 1px solid
+        var(
+          --vscode-widget-border,
+          var(--vscode-panel-border, rgba(128, 128, 128, 0.28))
+        );
+      background: var(
+        --vscode-editorWidget-background,
+        var(--vscode-sideBar-background, rgba(128, 128, 128, 0.06))
+      );
+      box-shadow:
+        0 1px 0 var(--vscode-titleBar-inactiveForeground, rgba(128, 128, 128, 0.08)),
+        0 6px 24px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.08));
+    }
+    ${scope} .wrap .scrollport.grabbing {
+      cursor: grabbing;
+    }
+    ${scope} .zoom-layer {
+      display: inline-block;
+      transform-origin: 0 0;
+    }
+    ${scope} .zoom-layer svg {
+      display: block;
+      max-width: none !important;
+      height: auto !important;
+      min-width: min-content;
+      vertical-align: top;
+      filter: drop-shadow(0 1px 1px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.06)));
+    }
+    ${scope} .zoom-layer svg text,
+    ${scope} .zoom-layer svg tspan {
+      paint-order: stroke fill;
+    }
+    ${scope} .error {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
+      font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
+      line-height: 1.5;
+      color: var(--vscode-errorForeground);
+      max-width: 100%;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid
+        var(
+          --vscode-inputValidation-errorBorder,
+          var(--vscode-errorForeground, rgba(220, 80, 80, 0.55))
+        );
+      background: var(
+        --vscode-inputValidation-errorBackground,
+        rgba(220, 80, 80, 0.09)
+      );
+      box-sizing: border-box;
+    }
+    ${scope} .loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: auto;
+      min-height: 120px;
+      max-width: 280px;
+      padding: 22px 26px;
+      text-align: center;
+      border-radius: 12px;
+      border: 1px solid
+        var(
+          --vscode-widget-border,
+          var(--vscode-panel-border, rgba(128, 128, 128, 0.25))
+        );
+      background: var(
+        --vscode-editorWidget-background,
+        var(--vscode-sideBar-background, rgba(128, 128, 128, 0.05))
+      );
+      box-shadow: 0 4px 20px var(--vscode-widget-shadow, rgba(0, 0, 0, 0.07));
+      font-size: var(--vscode-font-size, 13px);
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(
+        --vscode-descriptionForeground,
+        var(--vscode-editor-foreground)
+      );
+    }
+    ${scope} .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid
+        var(
+          --vscode-input-border,
+          var(--vscode-panel-border, rgba(128, 128, 128, 0.4))
+        );
+      border-top-color: var(
+        --vscode-progressBar-background,
+        var(--vscode-button-background, var(--vscode-focusBorder))
+      );
+      border-radius: 50%;
+      animation: pumlDiagramSpin 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    }
+    @keyframes pumlDiagramSpin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  `.trim();
+}
+
+/**
  * Remove blocos script de SVG antes de inserção inline (defesa em profundidade).
  */
 export function sanitizeSvgForInline(svg: string): string {
@@ -56,37 +186,12 @@ export function buildLoadingHtml(message = "Rendering diagram…"): string {
   const styles = `
     ${webviewSurfaceCss(`
       padding: 24px;
-      font-size: var(--vscode-font-size, 13px);
-      color: var(
-        --vscode-descriptionForeground,
-        var(--vscode-editor-foreground)
-      );
-    `)}
-    .loading {
       display: flex;
       align-items: center;
-      gap: 10px;
-    }
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid
-        var(
-          --vscode-input-border,
-          var(--vscode-panel-border, var(--vscode-widget-border, rgba(128, 128, 128, 0.45)))
-        );
-      border-top-color: var(
-        --vscode-progressBar-background,
-        var(--vscode-button-background, var(--vscode-focusBorder))
-      );
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+      justify-content: center;
+      min-height: 100%;
+    `)}
+    ${diagramAreaChromeCss(".puml-preview-body")}
   `.trim();
 
   return `<!DOCTYPE html>
@@ -96,7 +201,7 @@ export function buildLoadingHtml(message = "Rendering diagram…"): string {
   <meta http-equiv="Content-Security-Policy" content="${csp}" />
   <style>${styles}</style>
 </head>
-<body>
+<body class="puml-preview-body">
   <div class="loading" aria-live="polite">
     <div class="spinner" role="presentation"></div>
     <span>${escapeHtml(message)}</span>
@@ -179,47 +284,12 @@ export function buildPreviewHtml(
     ${webviewSurfaceCss(`
       padding: 12px;
     `)}
-    .wrap {
-      display: flex;
-      flex-direction: column;
+    ${diagramAreaChromeCss(".puml-preview-body")}
+    .puml-preview-body .wrap {
       min-height: 100%;
-      box-sizing: border-box;
     }
-    .scrollport {
-      flex: 1 1 auto;
-      overflow: auto;
-      min-height: 0;
-      cursor: grab;
-      -webkit-user-select: none;
-      user-select: none;
-      touch-action: none;
-    }
-    .scrollport.grabbing {
-      cursor: grabbing;
-    }
-    .zoom-layer {
-      display: inline-block;
-      transform-origin: 0 0;
+    .puml-preview-body .zoom-layer {
       zoom: ${z};
-    }
-    .zoom-layer svg {
-      display: block;
-      max-width: none !important;
-      height: auto !important;
-      min-width: min-content;
-      vertical-align: top;
-    }
-    .zoom-layer svg text,
-    .zoom-layer svg tspan {
-      paint-order: stroke fill;
-    }
-    .error {
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
-      font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
-      color: var(--vscode-errorForeground);
-      max-width: 100%;
     }
   `.trim();
 
@@ -231,7 +301,7 @@ export function buildPreviewHtml(
   <meta http-equiv="Content-Security-Policy" content="${cspNoScript}" />
   <style>${styles}</style>
 </head>
-<body>
+<body class="puml-preview-body">
   <div class="wrap">
     <div class="error">${escapeHtml(svgOrError.error)}</div>
   </div>
@@ -248,7 +318,7 @@ export function buildPreviewHtml(
   <meta http-equiv="Content-Security-Policy" content="${cspWithScript}" />
   <style>${styles}</style>
 </head>
-<body>
+<body class="puml-preview-body">
   <div class="wrap">
     <div class="scrollport" role="region" aria-label="PlantUML diagram — drag to pan when larger than the panel">
       <div class="zoom-layer">
