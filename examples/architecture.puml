@@ -4,7 +4,7 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Verdana
 
-title plantuml-plugin-manorfm v0.10.7 — architecture (this repo)
+title plantuml-plugin-manorfm v0.10.12 — architecture (this repo)
 
 left to right direction
 

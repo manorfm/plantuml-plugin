@@ -1,4 +1,8 @@
 import { diagramAreaChromeCss } from "../preview/html";
+import {
+  PREVIEW_ZOOM_MAX,
+  PREVIEW_ZOOM_MIN,
+} from "../constants/previewZoomLimits";
 
 /**
  * Static HTML document for {@link vscode.CustomTextEditorProvider}.
@@ -255,6 +259,30 @@ export function getPlantumlCustomEditorShellHtml(): string {
     prevX = x;
     prevY = y;
   }, { passive: true });
+  var minZ = ${PREVIEW_ZOOM_MIN};
+  var maxZ = ${PREVIEW_ZOOM_MAX};
+  el.addEventListener("wheel", function(e){
+    if (!(e.ctrlKey || e.metaKey)) return;
+    var zl = el.querySelector(".zoom-layer");
+    if (!zl) return;
+    e.preventDefault();
+    e.stopPropagation();
+    var cur = parseFloat(zl.style.zoom || "1");
+    if (!isFinite(cur) || cur <= 0) cur = 1;
+    var factor = Math.exp(-e.deltaY * 0.002);
+    var next = cur * factor;
+    if (next < minZ) next = minZ;
+    if (next > maxZ) next = maxZ;
+    next = Math.round(next * 1000) / 1000;
+    var rect = el.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    zl.style.zoom = String(next);
+    var ratio = next / cur;
+    el.scrollLeft = (el.scrollLeft + mx) * ratio - mx;
+    el.scrollTop = (el.scrollTop + my) * ratio - my;
+    vscode.postMessage({ type: "previewZoomChange", zoom: next });
+  }, { passive: false });
 })();`;
 
   return `<!DOCTYPE html>

@@ -4,6 +4,9 @@ import { expandPlantUmlIncludesCached } from "./expandIncludes";
 import { fetchSvgDiagram } from "./serverClient";
 import { applyDiagramPreamble } from "./sourceTransform";
 import {
+  invalidatePlantumlConfigCache,
+  PREVIEW_ZOOM_MAX,
+  PREVIEW_ZOOM_MIN,
   readPlantumlConfig,
 } from "../plantumlConfig";
 import { isPlantumlEditorDocument } from "../util/plantumlEditor";
@@ -224,6 +227,7 @@ export class PlantumlCustomEditorProvider
 
 type WebviewFromHostMessage =
   | { type: "ready" }
+  | { type: "previewZoomChange"; zoom: number }
   | { type: "docChange"; text: string }
   | { type: "requestHighlight"; text: string }
   | {
@@ -240,6 +244,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
   private abort: AbortController | undefined;
   private readonly debouncedRefresh: ReturnType<typeof debounce>;
   private readonly docSub: vscode.Disposable;
+  private zoomPersistTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(
     private readonly context: vscode.ExtensionContext,
@@ -286,10 +291,43 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
     this.debouncedRefresh.dispose();
     this.docSub.dispose();
     this.abort?.abort();
+    if (this.zoomPersistTimer !== undefined) {
+      clearTimeout(this.zoomPersistTimer);
+      this.zoomPersistTimer = undefined;
+    }
+  }
+
+  private schedulePersistPreviewZoom(zoom: number): void {
+    const clamped = Math.min(
+      PREVIEW_ZOOM_MAX,
+      Math.max(PREVIEW_ZOOM_MIN, zoom)
+    );
+    if (this.zoomPersistTimer !== undefined) {
+      clearTimeout(this.zoomPersistTimer);
+    }
+    this.zoomPersistTimer = setTimeout(() => {
+      this.zoomPersistTimer = undefined;
+      invalidatePlantumlConfigCache();
+      void vscode.workspace
+        .getConfiguration("plantumlViewer")
+        .update(
+          "previewZoom",
+          clamped,
+          vscode.ConfigurationTarget.Global
+        );
+    }, 300);
   }
 
   async handleMessage(msg: WebviewFromHostMessage): Promise<void> {
     if (!msg || typeof msg !== "object") {
+      return;
+    }
+    if (msg.type === "previewZoomChange") {
+      const z = msg.zoom;
+      if (typeof z !== "number" || !Number.isFinite(z)) {
+        return;
+      }
+      this.schedulePersistPreviewZoom(z);
       return;
     }
     if (msg.type === "requestHighlight") {

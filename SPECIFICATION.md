@@ -56,6 +56,7 @@ Permitir **visualizar e exportar** diagramas PlantUML a partir do editor, com UI
 | Includes locais | Resolução ou erro/ciclo reportado. |
 | Exportar | Escolha SVG/PNG e gravação em disco. |
 | Modos de vista | Só código / split / foco diagrama no **mesmo separador**; `toggleViewMode` em `editor/title`; toolbar Webview opcional (`view-modes`, `docs/editor-behavior-spec.md`). |
+| Zoom na área do diagrama | Roda do rato sobre o diagrama ajusta a escala dentro dos limites do produto (`diagram-wheel-zoom`). |
 | Edição de texto | Realce no custom editor (Webview) + TextMate no editor de texto; **Format document** (`plantuml-text-editor`). |
 
 ---
@@ -69,6 +70,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | HTTP, encoding, erros de rede | `specs/plantuml-server-client/` |
 | `!include`, préâmbulo | `specs/source-preparation/` |
 | Webview, tema, zoom, pan, loading | `specs/preview-rendering/` |
+| Zoom interactivo com roda na área do diagrama | `specs/diagram-wheel-zoom/` |
 | Modos, persistência, foco | `specs/view-modes/` |
 | Exportação ficheiro | `specs/export-diagram/` |
 | Sintaxe, formatação, script `vsix` | `specs/plantuml-text-editor/` |
@@ -95,6 +97,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | `specs/plantuml-server-client/` | Cliente HTTP PlantUML |
 | `specs/source-preparation/` | Preparação do texto (`!include`, préâmbulo) |
 | `specs/preview-rendering/` | Pré-visualização Webview |
+| `specs/diagram-wheel-zoom/` | Zoom com roda do rato no diagrama |
 | `specs/view-modes/` | Modos de vista |
 | `specs/export-diagram/` | Exportação SVG/PNG |
 | `specs/plantuml-text-editor/` | Sintaxe TextMate, formatação, script `vsix` |
@@ -104,7 +107,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 
 ## 6. Setup e referências
 
-- **Comandos de desenvolvimento:** `npm install`, `npm run compile`, `npm test`, `npm run vscode:package`, `npm run vsix` — critérios em `specs/engineering-release/`.
+- **Comandos de desenvolvimento:** `npm install`, `npm run compile`, `npm test`, `npm run test:coverage:unit`, `npm run vscode:package`, `npm run vsix` — critérios e limiares de cobertura em `specs/engineering-release/` e `docs/testing.md`.
 - **PlantUML Server:** [plantuml.com — servidor](https://plantuml.com/pt/server)
 - **Webview / theming:** [VS Code Webview](https://code.visualstudio.com/api/extension-guides/webview#theming-webview-content)
 
@@ -112,14 +115,14 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 
 ## 7. Cursor: regras e skills
 
-- Regras: `.cursor/rules/` (inclui `plantuml-plugin-context.mdc`, `spec-driven-development.mdc`).
+- Regras: `.cursor/rules/` (inclui `plantuml-plugin-context.mdc`, `spec-driven-development.mdc`, `test-coverage.mdc`).
 - Skills: `.cursor/skills/` — `vscode-plantuml-extension`, `typescript-vscode-extension`, `vscode-extension-testing`.
 
 ---
 
 ## 8. Versionamento e releases
 
-Política SemVer, geração do `.vsix` e coerência com README: **spec** `specs/engineering-release/spec.md`, **plan** e **tasks** correspondentes. Resumo: cada alteração de produto incrementa `version`, gera `plantuml-viewer-<versão>.vsix`, e actualiza exemplos de instalação no README quando aplicável.
+Política SemVer, geração do `.vsix` e coerência com README: **spec** `specs/engineering-release/spec.md`, **plan** e **tasks** correspondentes. Resumo: cada alteração de produto incrementa `version`, gera `plantuml-plugin-manorfm-<versão>.vsix`, e actualiza exemplos de instalação no README quando aplicável.
 
 ---
 

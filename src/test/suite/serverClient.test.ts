@@ -3,12 +3,20 @@ import {
   buildPlantumlGetUrl,
   DEFAULT_PLANTUML_SERVER_URL,
   encodeForPlantumlServer,
+  fetchPngDiagram,
   fetchSvgDiagram,
   getUnderlyingFetchErrorCode,
   MAX_PLANTUML_GET_URL_LENGTH,
   normalizeServerBaseUrl,
   plantumlFetchFailureHint,
 } from "../../plantuml/serverClient";
+
+/** Corpo mínimo com assinatura PNG (o cliente só valida os primeiros octetos). */
+function minimalPngBytes(): Uint8Array {
+  return new Uint8Array([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x00,
+  ]);
+}
 
 suite("plantuml/serverClient", () => {
   test("normalizeServerBaseUrl — vazio usa servidor público por defeito", () => {
@@ -51,6 +59,13 @@ suite("plantuml/serverClient", () => {
     assert.ok(h.length > 0);
     assert.ok(/localhost|server|port/i.test(h));
     assert.ok(/8081|plantumlViewer/i.test(h));
+  });
+
+  test("plantumlFetchFailureHint — ENOTFOUND", () => {
+    const h = plantumlFetchFailureHint(
+      Object.assign(new Error("getaddrinfo"), { code: "ENOTFOUND" })
+    );
+    assert.ok(/host|DNS|plantumlViewer/i.test(h));
   });
 
   test("buildPlantumlGetUrl — diagramas grandes excedem limite GET", () => {
@@ -207,5 +222,53 @@ suite("plantuml/serverClient — fetch mockado (integração leve)", () => {
     const r = await fetchSvgDiagram("http://127.0.0.1:8080", longBody);
     assert.strictEqual(sawPost, true);
     assert.strictEqual(r.kind, "svg");
+  });
+
+  test("fetchPngDiagram — GET devolve bytes PNG", async () => {
+    const buf = minimalPngBytes();
+    globalThis.fetch = (async () =>
+      new Response(buf, {
+        status: 200,
+        headers: { "Content-Type": "image/png" },
+      })) as typeof fetch;
+
+    const r = await fetchPngDiagram("http://127.0.0.1:8080", "@startuml\n@enduml\n");
+    assert.strictEqual(r.kind, "png");
+    if (r.kind === "png") {
+      assert.strictEqual(r.data[0], 0x89);
+    }
+  });
+
+  test("fetchPngDiagram — corpo sem assinatura PNG devolve erro", async () => {
+    globalThis.fetch = (async () =>
+      new Response(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]), {
+        status: 200,
+      })) as typeof fetch;
+
+    const r = await fetchPngDiagram("http://127.0.0.1:8080", "@startuml\n@enduml\n");
+    assert.strictEqual(r.kind, "error");
+    if (r.kind === "error") {
+      assert.ok(/not PNG/i.test(r.message));
+    }
+  });
+
+  test("GET 404 em /png/… tenta POST e obtém PNG", async () => {
+    const buf = minimalPngBytes();
+    let getPng = 0;
+    globalThis.fetch = (async (input: unknown, init?: RequestInit) => {
+      const url = typeof input === "string" ? input : String(input);
+      if (init?.method === "GET" && url.includes("/png/")) {
+        getPng += 1;
+        return new Response("Not Found", { status: 404 });
+      }
+      if (init?.method === "POST" && url.endsWith("/png")) {
+        return new Response(buf, { status: 200 });
+      }
+      return new Response("unexpected", { status: 500 });
+    }) as typeof fetch;
+
+    const r = await fetchPngDiagram("http://127.0.0.1:8080", "@startuml\n@enduml\n");
+    assert.strictEqual(getPng, 1);
+    assert.strictEqual(r.kind, "png");
   });
 });

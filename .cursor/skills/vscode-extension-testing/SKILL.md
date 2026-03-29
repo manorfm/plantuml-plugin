@@ -29,17 +29,14 @@ src/test/
 ```
 
 - **Testes de integração:** ativar extensão, executar comandos com `vscode.commands.executeCommand`, asserções sobre estado ou mocks.
-- **Testes unitários** (encoding PlantUML, URL helpers): podem correr com Node puro + Mocha se isolados, sem Extension Host — opcional para rapidez.
+- **Testes unitários** (encoding PlantUML, URL helpers, `debounce`, cache): podem correr com Node puro + Mocha + **c8** (`npm run test:coverage:unit`) sem Extension Host, quando o módulo não faz `require('vscode')` ao carregar.
 
-## Scripts em `package.json` (a adicionar na implementação)
+## Scripts em `package.json`
 
-```json
-"scripts": {
-  "test": "node ./dist/test/runTest.js"
-}
-```
+- **`npm test`** — `node ./dist/test/runTest.js` (Extension Host, suíte completa).
+- **`npm run test:coverage:unit`** — compile + **c8** + Mocha sobre o subset listado no script; **`check-coverage`** e limiares estão em `package.json` → secção `c8`. Deve passar após alterações em `src/**` (ver `.cursor/rules/test-coverage.mdc`).
 
-Compilar `src/test` com o mesmo `tsconfig` ou `references` — alinhar com a documentação atual de [@vscode/test-electron](https://github.com/microsoft/vscode-test).
+Compilar `src/test` com o mesmo `tsconfig` — [@vscode/test-electron](https://github.com/microsoft/vscode-test).
 
 ## Boas práticas
 

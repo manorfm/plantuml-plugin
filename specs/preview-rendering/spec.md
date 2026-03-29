@@ -26,3 +26,4 @@ O utilizador precisa de ver o diagrama renderizado junto do código, com aparên
 
 - Comandos exactos da paleta e persistência de modo de vista — ver spec de modos de vista.
 - Protocolo HTTP — ver spec do cliente servidor.
+- Zoom interactivo com a **roda do rato** sobre a área do diagrama — `specs/diagram-wheel-zoom/`.

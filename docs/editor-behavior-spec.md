@@ -105,6 +105,7 @@ Setting `plantumlViewer.showWebviewToolbar` (default **on**): top row with **thr
 
 - Reuses `expandPlantUmlIncludes`, `applyDiagramPreamble`, `fetchSvgDiagram` and fragments `buildDiagramLoadingMountContent` / `buildDiagramMountContent` (`preview/html.ts`).
 - SVG sanitized as before; pan/drag re-bound after each `innerHTML` in the diagram container.
+- **Zoom:** Ctrl/Cmd + mouse wheel adjusts `.zoom-layer` scale and **scroll** so the content under the cursor stays fixed; changes persist to `plantumlViewer.previewZoom` (debounced). Plain wheel scrolls the diagram viewport.
 
 ### Text
 

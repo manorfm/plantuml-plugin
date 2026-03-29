@@ -47,3 +47,11 @@ export function setCachedDiagram(
   }
   store.set(key, value);
 }
+
+/**
+ * Clears the in-memory diagram cache. Used by tests; safe to call when switching fixtures.
+ */
+export function clearDiagramSvgCache(): void {
+  store.clear();
+}
+

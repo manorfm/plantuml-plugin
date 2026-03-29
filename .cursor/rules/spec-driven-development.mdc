@@ -25,6 +25,8 @@ Ficheiro global único: **`SPECIFICATION.md`** na raiz (case-sensitive em Linux;
 
 Validar o código contra o **`spec.md`** da feature antes de considerar a tarefa fechada.
 
+**Cobertura:** após alterações em `src/**`, cumprir a regra **`.cursor/rules/test-coverage.mdc`** (`npm test` + `npm run test:coverage:unit`).
+
 ## O que não fazer
 
 - Não usar apenas o monólito global como único guia para mudanças finas de comportamento (sempre cruzar com a feature).

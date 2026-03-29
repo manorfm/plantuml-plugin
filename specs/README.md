@@ -22,6 +22,7 @@ Alterações de comportamento devem **actualizar primeiro** o `spec.md` (ou o gl
 | [`plantuml-server-client/`](./plantuml-server-client/) | Cliente HTTP ao servidor PlantUML (codificação, GET/POST, timeouts, erros). |
 | [`source-preparation/`](./source-preparation/) | Transformação do texto fonte antes do envio (`!include`, préâmbulo). |
 | [`preview-rendering/`](./preview-rendering/) | Painel Webview, HTML temático, SVG inline, zoom, pan, estados de UI. |
+| [`diagram-wheel-zoom/`](./diagram-wheel-zoom/) | Zoom in/out com a roda do rato sobre a área do diagrama (limites alinhados a `previewZoom`). |
 | [`view-modes/`](./view-modes/) | Três modos de vista, persistência, foco e barra do editor. |
 | [`export-diagram/`](./export-diagram/) | Exportação SVG/PNG para ficheiro. |
 | [`engineering-release/`](./engineering-release/) | Testes, empacotamento `.vsix`, SemVer e coerência de documentação. |

@@ -1,0 +1,22 @@
+---
+description: Cobertura de testes obrigatória em alterações a código TypeScript da extensão
+alwaysApply: true
+---
+
+# Cobertura de testes (extensão PlantUML)
+
+## Quando alterar `src/**/*.ts` (excepto só tipos ou comentários)
+
+1. **Adicionar ou actualizar testes** em `src/test/suite/` que cubram o novo comportamento ou regressões.
+2. Executar **`npm run compile`** e **`npm test`** (Extension Host).
+3. Executar **`npm run test:coverage:unit`** — o **c8** está configurado em `package.json` → `c8` com **`check-coverage: true`** e limiares mínimos (`lines`, `statements`, `branches`, `functions`). **Não** concluir a tarefa se este comando falhar.
+4. Se a alteração for só em módulos que **não** entram no subset Node (dependem de `vscode` ao carregar), garantir pelo menos cobertão via **`npm test`** e, quando possível, extrair lógica pura para um módulo testável pelo subset.
+
+## Onde está documentado
+
+- **`specs/engineering-release/spec.md`** — critérios de aceitação de qualidade e cobertura.
+- **`docs/testing.md`** — comandos, pirâmide de testes e limiares.
+
+## Integração contínua
+
+O workflow **`.github/workflows/ci.yml`** corre `npm test` e `npm run test:coverage:unit` em PRs para `main`/`master`.

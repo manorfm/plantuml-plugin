@@ -14,6 +14,7 @@
 |---------|----------------|
 | SemVer em `package.json` | Contrato com utilizadores e marketplace. |
 | PATCH vs MINOR em `0.y.z` | Política descrita no documento global (resumo abaixo). |
+| `plantuml/plantumlConnectionSettings.ts` | Normalização de settings sem `vscode`; `plantumlConfig.ts` delega — testável no subset Node + c8. |
 
 ## Trade-offs
 
@@ -27,7 +28,7 @@
 
 ## Módulos de referência
 
-- `package.json`, `.vscodeignore` (exclui `specs/**` e `SPECIFICATION.md` do VSIX — documentação SDD só no repositório), `src/test/runTest.ts`, scripts npm.
+- `package.json`, `.vscodeignore` (exclui `specs/**`, `SPECIFICATION.md`, `coverage/**`, `.github/**`, `dist/test/**` do VSIX), `src/test/runTest.ts`, scripts npm.
 
 ## Dependências
 
