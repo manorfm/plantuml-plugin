@@ -1,175 +1,175 @@
 # PlantUML Viewer
 
-Extensão para [Visual Studio Code](https://code.visualstudio.com/) e editores compatíveis (por exemplo [Cursor](https://cursor.com/)) que **pré-visualiza** diagramas [PlantUML](https://plantuml.com/) a partir de ficheiros `.puml` / `.plantuml`, usando um **servidor PlantUML** local ou na rede.
+Extension for [Visual Studio Code](https://code.visualstudio.com/) and compatible editors (e.g. [Cursor](https://cursor.com/)) that **previews** [PlantUML](https://plantuml.com/) diagrams from `.puml` / `.plantuml` files using a **PlantUML server** on your machine or over the network.
 
-## Requisitos
+## Requirements
 
-- **Editor:** VS Code ≥ 1.85 (ver `engines.vscode` em `package.json`).
-- **Servidor PlantUML** acessível por HTTP (a extensão não embute o motor Java). **Por defeito** usa-se o servidor HTTP oficial em `https://www.plantuml.com/plantuml`, para a pré-visualização funcionar **sem instalar Docker**. O texto do diagrama é enviado a esse serviço — para **dados confidenciais** ou **offline**, altere **PlantUML Viewer → Server URL** para um servidor **local** (Docker abaixo).
+- **Editor:** VS Code ≥ 1.85 (see `engines.vscode` in `package.json`).
+- **PlantUML server** reachable over HTTP (the extension does not bundle the Java engine). **By default** it uses the official HTTP server at `https://www.plantuml.com/plantuml` so preview works **without Docker**. Diagram source is sent to that service — for **confidential** data or **offline** use, set **PlantUML Viewer → Server URL** to a **local** server (Docker below).
 
-### Servidor local (exemplo Docker)
+### Local server (Docker example)
 
 ```bash
 docker run -d -p 8080:8080 plantuml/plantuml-server:jetty
 ```
 
-Se a **porta 8080 já estiver em uso** (outro contentor ou aplicação), use outra porta no anfitrião e a mesma no URL da extensão, por exemplo:
+If **port 8080 is already in use** (another container or app), map a different host port and use the same in the extension URL, for example:
 
 ```bash
 docker run -d -p 8081:8080 plantuml/plantuml-server:jetty
 ```
 
-Em **Definições → PlantUML Viewer → Server URL**, defina `http://127.0.0.1:8081` (ou o valor correcto).
+In **Settings → PlantUML Viewer → Server URL**, set `http://127.0.0.1:8081` (or the correct value).
 
-Confirme que o serviço responde no URL configurado em **Definições → PlantUML Viewer → Server URL**.
+Confirm the service responds at the URL configured under **Settings → PlantUML Viewer → Server URL**.
 
-## Funcionalidades
+## Features
 
-- **Três modos de vista** (persistidos por ficheiro): **só código**, **código e diagrama**, **só diagrama**, no **mesmo separador** (`CustomTextEditorProvider`). **Um** botão na barra do título (`plantumlViewer.toggleViewMode`, ciclo code→split→preview) com ícone conforme o modo actual. **Refresh** e **Export** na **barra de estado** (com custom editor activo) e na **barra interna da Webview** (`showWebviewToolbar`): **três botões de ícone** para modo (código / split / pré-visualização) + ícones para refresh e export. Comandos directos de modo e paleta mantêm-se para atalhos.
-- Pré-visualização **SVG inline** com **tema** do VS Code; pan e zoom como antes.
-- **Pan:** quando o diagrama é maior que o painel, **arraste** com o rato (ou arraste com o dedo em ecrã táctil) para deslocar a vista; a **roda** do rato faz scroll como habitualmente.
-- **Atualização automática** opcional ao editar (com debounce) ou **atualização manual**.
-- **Tempo limite** configurável para pedidos HTTP ao servidor.
-- **Escala** da pré-visualização (`previewZoom`).
-- **Préâmbulo opcional** (`diagramPreamble`) — texto colocado **antes** do diagrama (após `!include`), útil para `!theme`, `skinparam`, etc., conforme o servidor suportar.
-- Expansão de **`!include`** com caminhos relativos ao ficheiro: `ficheiro.puml`, `<ficheiro.puml>`, `"caminho com espaços.puml"`. **`!includeurl`** não é expandido localmente (mantém-se a linha).
-- **Diagramas muito grandes:** quando a URL GET codificada fica demasiado longa, a extensão usa **POST** com o texto do diagrama para `/svg` ou `/png` (plantuml-server; versões muito antigas podem não suportar).
-- **Exportação** do diagrama para ficheiro **SVG** ou **PNG** (via servidor).
-- **Realce de sintaxe PlantUML** (TextMate embebido) e **Format document** no **editor de texto**; comando **PlantUML: Format document** também com o **PlantUML Viewer** (custom editor) activo. Ver `specs/plantuml-text-editor/`.
-- Empacotamento **`.vsix`**: `npm run vscode:package` ou **`npm run vsix`** (compila + empacota).
+- **Three view modes** (persisted per file): **code only**, **code + diagram**, **diagram only**, in the **same tab** (`CustomTextEditorProvider`). **One** button in the title bar (`plantumlViewer.toggleViewMode`, cycles code→split→preview) with an icon for the current mode. **Refresh** and **Export** in the **status bar** (with the custom editor active) and in the **webview toolbar** (`showWebviewToolbar`): **three mode icon buttons** (code / split / preview) plus refresh and export icons. Direct mode commands remain in the palette for keybindings.
+- **Inline SVG** preview with the VS Code **theme**; pan and zoom as before.
+- **Pan:** when the diagram is larger than the panel, **drag** with the mouse (or touch) to move the view; the mouse **wheel** scrolls as usual.
+- Optional **auto-refresh** while editing (debounced) or **manual** refresh.
+- Configurable **timeout** for HTTP requests to the server.
+- **Scale** for the preview (`previewZoom`).
+- Optional **preamble** (`diagramPreamble`) — text placed **before** the diagram (after `!include`), useful for `!theme`, `skinparam`, etc., depending on server support.
+- **`!include` expansion** with paths relative to the file: `file.puml`, `<file.puml>`, `"path with spaces.puml"`. **`!includeurl`** is not expanded locally (the line is kept).
+- **Very large diagrams:** when the encoded GET URL is too long, the extension uses **POST** with the diagram text to `/svg` or `/png` (plantuml-server; very old servers may not support it).
+- **Export** to **SVG** or **PNG** (via the server).
+- **PlantUML syntax highlighting** (embedded TextMate) and **Format document** in the **text editor**; **PlantUML: Format document** also works with the **PlantUML Viewer** (custom editor) active. See `specs/plantuml-text-editor/`.
+- Package as **`.vsix`**: `npm run vscode:package` or **`npm run vsix`** (compile + package).
 
-## Exemplo de diagrama (este projeto)
+## Sample diagram (this repository)
 
-Na pasta **`examples/`** está o ficheiro **`architecture.puml`**, que descreve a arquitetura dos módulos desta extensão. Com o **servidor PlantUML** a correr e esta extensão instalada, abra o ficheiro (abre no **PlantUML Viewer** por defeito) ou use **Modo código e diagrama** / **Abrir pré-visualização** na paleta; o modo **split** é o defeito por URI até alterar.
+The **`examples/`** folder contains **`architecture.puml`**, describing the architecture of this extension. With the **PlantUML server** running and this extension installed, open the file (opens in **PlantUML Viewer** by default) or use **Code and diagram** / **Open preview** from the palette; **split** is the default per URI until you change it.
 
-## Limitações (importante)
+## Limitations (important)
 
-- **Área do diagrama:** dentro do **mesmo separador** que o código (editor personalizado). Para voltar ao editor de texto clássico: **Reopen Editor With… → Text Editor**.
-- **Dentro do SVG:** o fundo e o estilo **desenhados pelo PlantUML** no ficheiro SVG (por exemplo fundo branco) **não** são alterados pela extensão. O que segue o tema do VS Code é o **painel** da Webview (fundo do painel, texto de erro).
-- **Temas PlantUML** (`!theme`, `skinparam` no préâmbulo) dependem do **servidor** e da versão do motor; a extensão apenas envia o texto.
-- Servidores sem suporte a **POST** nos endpoints acima podem falhar em diagramas extremamente grandes.
+- **Diagram area:** inside the **same tab** as the code (custom editor). To return to the classic text editor: **Reopen Editor With… → Text Editor**.
+- **Inside the SVG:** background and style **drawn by PlantUML** in the SVG (e.g. white background) are **not** changed by the extension. What follows the VS Code theme is the **webview panel** (panel background, error text).
+- **PlantUML themes** (`!theme`, `skinparam` in the preamble) depend on the **server** and engine version; the extension only sends the text.
+- Servers without **POST** support on the above endpoints may fail for extremely large diagrams.
 
-## Erro «fetch failed» ou falha de rede
+## “fetch failed” or network errors
 
-Se a mensagem ainda mostrar **`http://127.0.0.1:8080`** mas não usa servidor local, provavelmente **Server URL** ficou guardado com esse valor nas definições (utilizador ou espaço de trabalho). Apague o valor para voltar ao defeito da extensão ou defina explicitamente `https://www.plantuml.com/plantuml`.
+If the message still shows **`http://127.0.0.1:8080`** but you are not using a local server, **Server URL** was probably saved with that value in user or workspace settings. Clear the value to restore the extension default or set it explicitly to `https://www.plantuml.com/plantuml`.
 
-1. **Com o URL por defeito** (`https://www.plantuml.com/plantuml`): confirme **ligação à Internet**, firewall e proxy. Teste no terminal:  
-   `curl -sS -o /dev/null -w "%{http_code}\n" "https://www.plantuml.com/plantuml/"` — deve obter `200` ou redirecção.
-2. **Com servidor local** (`http://127.0.0.1:8080`, etc.): confirme que o contentor ou processo está a correr — ex.:  
+1. **With the default URL** (`https://www.plantuml.com/plantuml`): check **Internet** access, firewall, and proxy. Test in a terminal:  
+   `curl -sS -o /dev/null -w "%{http_code}\n" "https://www.plantuml.com/plantuml/"` — expect `200` or a redirect.
+2. **With a local server** (`http://127.0.0.1:8080`, etc.): ensure the container or process is running — e.g.  
    `docker run -d -p 8080:8080 plantuml/plantuml-server:jetty`  
-   **Porta ocupada:** use `-p 8081:8080` e **Server URL** `http://127.0.0.1:8081`. Teste: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/`.
-3. Em **Definições → PlantUML Viewer → Server URL**, o URL deve coincidir com o servidor real. Em **WSL** ou **Remote-SSH**, `127.0.0.1` é o ambiente onde a extensão corre; alinhe host e porta em conformidade.
+   **Port in use:** use `-p 8081:8080` and **Server URL** `http://127.0.0.1:8081`. Test: `curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/`.
+3. Under **Settings → PlantUML Viewer → Server URL**, the URL must match the real server. In **WSL** or **Remote-SSH**, `127.0.0.1` is the environment where the extension runs; align host and port accordingly.
 
-A mensagem de erro na pré-visualização foi alargada para explicar **ligação recusada** (`ECONNREFUSED`) e outros casos comuns.
+The preview error message explains **connection refused** (`ECONNREFUSED`) and other common cases.
 
-**Erro 404 em `/svg` ou `/png`:** (1) **Server URL** deve ser a **base** correcta: Docker local `http://127.0.0.1:8080` (sem path extra); servidor público `https://www.plantuml.com/plantuml`. A extensão chama `GET/POST {base}/svg` e `…/png`. (2) URLs GET muito longas: usa-se POST; se o GET devolver 404/414, repete-se com POST.
+**404 on `/svg` or `/png`:** (1) **Server URL** must be the correct **base**: local Docker `http://127.0.0.1:8080` (no extra path); public server `https://www.plantuml.com/plantuml`. The extension calls `GET/POST {base}/svg` and `…/png`. (2) Very long GET URLs: POST is used; if GET returns 404/414, it retries with POST.
 
-## Instalação e atualização
+## Installation and updates
 
-### Pré-requisitos
+### Prerequisites
 
-1. **Editor:** Visual Studio Code, Cursor ou outro derivado do VS Code (≥ versão em `engines.vscode` no `package.json`).
-2. **Rede** para o URL por defeito (`plantuml.com`), ou **servidor PlantUML** local se alterar **Server URL** (Docker — ver [Requisitos](#requisitos)).
+1. **Editor:** Visual Studio Code, Cursor, or another VS Code–based editor (≥ version in `engines.vscode` in `package.json`).
+2. **Network** for the default URL (`plantuml.com`), or a **local PlantUML server** if you change **Server URL** (Docker — see [Requirements](#requirements)).
 
-### Instalar a extensão a partir do ficheiro `.vsix`
+### Install from a `.vsix` file
 
-O pacote **`.vsix`** contém a extensão pronta a instalar (gerado com `npm run vscode:package` na raiz do repositório).
+The **`.vsix`** package contains the ready-to-install extension (built with `npm run vscode:package` at the repository root).
 
-**Opção A — pela paleta de comandos**
+**Option A — Command Palette**
 
-1. **View → Command Palette** (ou `Ctrl+Shift+P` / `Cmd+Shift+P`).
-2. Escolha **Extensions: Install from VSIX…** (ou o equivalente no seu idioma).
-3. Selecione o ficheiro `plantuml-viewer-<versão>.vsix` (o nome inclui a versão definida em `package.json`).
+1. **View → Command Palette** (or `Ctrl+Shift+P` / `Cmd+Shift+P`).
+2. Run **Extensions: Install from VSIX…**.
+3. Select `plantuml-viewer-<version>.vsix` (the filename includes the version from `package.json`).
 
-**Opção B — linha de comandos**
+**Option B — Command line**
 
 ```bash
 # Visual Studio Code
-code --install-extension ./plantuml-viewer-0.10.3.vsix
+code --install-extension ./plantuml-viewer-0.10.5.vsix
 
-# Cursor (se o CLI estiver no PATH)
-cursor --install-extension ./plantuml-viewer-0.10.3.vsix
+# Cursor (if the CLI is on your PATH)
+cursor --install-extension ./plantuml-viewer-0.10.5.vsix
 ```
 
-Substitua `0.10.3` pela versão real do ficheiro gerado (`version` em `package.json`). Use o caminho absoluto ou relativo correcto até ao `.vsix`.
+Replace `0.10.5` with the actual version of the generated file (`version` in `package.json`). Use the correct absolute or relative path to the `.vsix`.
 
-Depois da instalação, confirme que a extensão aparece em **Extensions** com o nome **PlantUML Viewer** (publisher `local`, salvo tenha alterado o `publisher` no `package.json`).
+After installation, confirm the extension appears under **Extensions** as **PlantUML Viewer** (publisher `local`, unless you changed `publisher` in `package.json`).
 
-### Atualizar a extensão
+### Updating the extension
 
-Para passar para uma **versão mais nova** do mesmo pacote:
+To move to a **newer** version of the same package:
 
-1. **Incremente** o campo `version` em `package.json` (semântica `X.Y.Z` é a usual).
-2. Gere o novo pacote: `npm run vscode:package`.
-3. Instale de novo o `.vsix` com um dos métodos acima. O instalador **substitui** a versão anterior com o mesmo identificador (`publisher.name`).
+1. **Bump** the `version` field in `package.json` (usually semantic `X.Y.Z`).
+2. Build the new package: `npm run vscode:package`.
+3. Install the new `.vsix` using one of the methods above. The installer **replaces** the previous version with the same identifier (`publisher.name`).
 
-Se preferir remover antes de instalar: **Extensions** → localize **PlantUML Viewer** → **Uninstall**, depois instale o novo `.vsix`.
+To remove first: **Extensions** → find **PlantUML Viewer** → **Uninstall**, then install the new `.vsix`.
 
-Recomenda-se **recarregar a janela** do editor após instalar ou atualizar: **Command Palette → Developer: Reload Window**.
+**Reload the window** after install or update: **Command Palette → Developer: Reload Window**.
 
-### Instalação em modo desenvolvimento (sem `.vsix`)
+### Development install (without `.vsix`)
 
-Para testar alterações ao código antes de empacotar:
+To try code changes before packaging:
 
 ```bash
 npm install
 npm run compile
 ```
 
-Abra a pasta do repositório no editor e use **Run → Start Debugging** (F5). Abre-se uma **Extension Development Host** com esta extensão carregada a partir do código-fonte.
+Open the repository folder in the editor and use **Run → Start Debugging** (F5). An **Extension Development Host** opens with this extension loaded from source.
 
-## Comandos
+## Commands
 
-| Comando | Descrição |
-|--------|-----------|
-| **PlantUML: Cycle view mode** | Alterna **code → split → preview → code** no custom editor activo (também é o único botão em `editor/title`). |
-| **PlantUML: Code only** | Força modo código (paleta / atalhos). |
-| **PlantUML: Code and diagram** | Força modo split. |
-| **PlantUML: Diagram only** | Força modo só diagrama. |
-| **PlantUML: Open preview** | Igual a **Code and diagram**. |
-| **PlantUML: Refresh preview** | Re-render no custom editor activo (também na status bar e na webview). |
-| **PlantUML: Export diagram…** | Exporta SVG/PNG (também na status bar e na webview). |
-| **PlantUML: Format document** | Formata e indenta o `.puml` (custom editor activo ou **Format Document** no editor de texto). |
+| Command | Description |
+|--------|-------------|
+| **PlantUML: Cycle view mode** | Cycles **code → split → preview → code** in the active custom editor (also the only `editor/title` button). |
+| **PlantUML: Code only** | Forces code mode (palette / keybindings). |
+| **PlantUML: Code and diagram** | Forces split mode. |
+| **PlantUML: Diagram only** | Forces diagram-only mode. |
+| **PlantUML: Open preview** | Same as **Code and diagram**. |
+| **PlantUML: Refresh preview** | Re-renders in the active custom editor (also status bar and webview). |
+| **PlantUML: Export diagram…** | Exports SVG/PNG (also status bar and webview). |
+| **PlantUML: Format document** | Formats and indents `.puml` (active custom editor or **Format Document** in the text editor). |
 
-**Where the buttons are:** **Editor title:** só **ciclo de modo** (`navigation@1`, ícone conforme `plantumlViewer.viewMode`). **Status bar:** Refresh + Export com custom editor activo. **Webview:** barra superior opcional com **três ícones de modo** + refresh e export em ícone. **CodeLens:** só refresh no editor de texto, se `showModeCodeLens`.
+**Where the buttons are:** **Editor title:** only the **mode cycle** (`navigation@1`, icon reflects `plantumlViewer.viewMode`). **Status bar:** Refresh + Export when the custom editor is active. **Webview:** optional top bar with **three mode icons** + refresh and export icons. **CodeLens:** refresh only in the **text** editor if `showModeCodeLens`.
 
-**Onde está o diagrama:** no **mesmo separador** que o código (modo split ou só diagrama). Documentação técnica: **`docs/editor-behavior-spec.md`**.
+**Where the diagram lives:** in the **same tab** as the code (split or diagram-only mode). Technical details: **`docs/editor-behavior-spec.md`**.
 
-**Realce de sintaxe:** no **PlantUML Viewer** (custom editor), a área de código usa uma camada `<pre>` colorida por baixo da textarea (`webviewHighlight.ts`). Com **Reopen Editor With… → Text Editor**, a **gramática TextMate** (`syntaxes/plantuml.tmLanguage.json`) também colore o buffer `plantuml`.
+**Syntax highlighting:** In the **PlantUML Viewer** (custom editor), the code area uses a colored `<pre>` layer under the textarea (`webviewHighlight.ts`). With **Reopen Editor With… → Text Editor**, the **TextMate grammar** (`syntaxes/plantuml.tmLanguage.json`) colors the `plantuml` buffer.
 
-## Configuração (`plantumlViewer.*`)
+## Settings (`plantumlViewer.*`)
 
-| Chave | Descrição |
-|-------|-----------|
-| `serverUrl` | URL **base** **sem** barra final. **Defeito:** `https://www.plantuml.com/plantuml` (rede; evite para diagramas confidenciais). Local: Docker `http://127.0.0.1:8080` (ou outra porta). Pedidos: `{base}/svg` e `{base}/png`. |
-| `autoRefresh` | Atualizar a pré-visualização ao editar (debounce ~500 ms). |
-| `requestTimeoutMs` | Tempo máximo (ms) para cada pedido HTTP. |
-| `previewZoom` | Escala do diagrama na Webview (0,25 a 3; 1 = 100 %). |
-| `diagramPreamble` | Texto opcional **antes** do diagrama (várias linhas), após expansão de `!include` — por exemplo `!theme plain`. |
-| `showWebviewToolbar` | **true** por defeito: barra na Webview com ícones de modo (3) + refresh + export. |
-| `showStatusBarActions` | **true** por defeito: Refresh + Export na barra de estado (só com custom editor activo). |
-| `showModeCodeLens` | **false** por defeito: CodeLens só refresh no editor de **texto** (fallback opcional). |
+| Key | Description |
+|-----|-------------|
+| `serverUrl` | **Base** URL **without** a trailing slash. **Default:** `https://www.plantuml.com/plantuml` (network; avoid for confidential diagrams). Local: Docker `http://127.0.0.1:8080` (or another port). Requests: `{base}/svg` and `{base}/png`. |
+| `autoRefresh` | Refresh the preview while editing (debounce ~500 ms). |
+| `requestTimeoutMs` | Maximum time (ms) for each HTTP request. |
+| `previewZoom` | Diagram scale in the webview (0.25 to 3; 1 = 100%). |
+| `diagramPreamble` | Optional text **before** the diagram (multiple lines), after `!include` expansion — e.g. `!theme plain`. |
+| `showWebviewToolbar` | **true** by default: webview bar with mode icons (3) + refresh + export. |
+| `showStatusBarActions` | **true** by default: Refresh + Export in the status bar (custom editor active only). |
+| `showModeCodeLens` | **false** by default: CodeLens refresh only in the **text** editor (optional fallback). |
 
 ## `!include`
 
-Linhas `!include` são expandidas **antes** do envio ao servidor, com leitura de ficheiros relativos ao documento. São aceites formas como `!include partes/a.puml`, `!include <estilos.puml>` e `!include "ficheiro com espaços.puml"`. URLs em **`!includeurl`** não são tratadas como ficheiros locais. Documentos **só em memória** (não guardados como `file:`) não aplicam includes em disco; guarde o ficheiro para caminhos consistentes.
+`!include` lines are expanded **before** sending to the server, reading files relative to the document. Supported forms include `!include parts/a.puml`, `!include <styles.puml>`, and `!include "file with spaces.puml"`. **`!includeurl`** URLs are not treated as local files. **Unsaved** documents (not `file:`) do not resolve on-disk includes; save the file for consistent paths.
 
-## Exportação
+## Export
 
-O export usa o mesmo servidor, as mesmas expansões de `!include` e o mesmo **préâmbulo** que a pré-visualização. É necessário que o documento esteja guardado em disco (`file:`).
+Export uses the same server, the same `!include` expansion, and the same **preamble** as preview. The document must be saved to disk (`file:`).
 
-## Desenvolvimento
+## Development
 
 ```bash
-npm run compile    # compilar TypeScript
-npm run watch      # compilar em modo observação
-npm test           # testes (Extension Host + Mocha)
-npm run vscode:package   # gera plantuml-viewer-*.vsix
-npm run vsix             # compile + vsce package (atalho)
+npm run compile    # compile TypeScript
+npm run watch      # watch mode
+npm test           # tests (Extension Host + Mocha)
+npm run vscode:package   # builds plantuml-viewer-*.vsix
+npm run vsix             # compile + vsce package (shortcut)
 ```
 
-Documentação técnica detalhada: **`SPECIFICATION.md`** na raiz; comportamento do editor: **`docs/editor-behavior-spec.md`** (inclui versionamento SemVer em `SPECIFICATION.md` e geração do `.vsix`).
+Detailed technical documentation: **`SPECIFICATION.md`** at the repository root (not shipped in the `.vsix`); editor behavior: **`docs/editor-behavior-spec.md`** (includes SemVer and `.vsix` build notes in `SPECIFICATION.md`).
 
-## Licença
+## License
 
-MIT — ver ficheiro `LICENSE`.
+MIT — see the `LICENSE` file.

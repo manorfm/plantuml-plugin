@@ -1,20 +1,42 @@
 {
   "name": "plantuml-viewer",
   "displayName": "PlantUML Viewer",
-  "description": "Preview PlantUML diagrams (.puml) in the editor with live updates.",
-  "version": "0.10.3",
+  "description": "Preview PlantUML diagrams in the editor: live SVG, code/split/diagram modes, export PNG/SVG. Uses a configurable HTTP server; diagram text is sent over the network unless you use a local server.",
+  "icon": "media/icon.png",
+  "version": "0.10.5",
   "publisher": "local",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/local/plantuml-viewer.git"
   },
+  "bugs": {
+    "url": "https://github.com/local/plantuml-viewer/issues"
+  },
+  "galleryBanner": {
+    "color": "#1b4332",
+    "theme": "dark"
+  },
+  "keywords": [
+    "plantuml",
+    "uml",
+    "diagram",
+    "preview",
+    "svg",
+    "png",
+    "puml",
+    "sequence diagram",
+    "class diagram",
+    "architecture",
+    "render",
+    "export"
+  ],
   "engines": {
     "vscode": "^1.85.0"
   },
   "categories": [
-    "Visualization",
-    "Other"
+    "Programming Languages",
+    "Visualization"
   ],
   "activationEvents": [
     "onCustomEditor:plantumlViewer.plantumlEditor",

@@ -1,20 +1,20 @@
-# Especificação técnica: comportamento do editor PlantUML Viewer
+# Technical specification: PlantUML Viewer editor behavior
 
 ## 1. Overview
 
-### Propósito
+### Purpose
 
-O ficheiros `.puml` / `.plantuml` / `.pu` / `.wsd` abrem por defeito no **editor personalizado** (`CustomTextEditorProvider`), que combina edição de texto e renderização PlantUML **no mesmo separador**, sem painéis laterais nem novos grupos de editores criados pela extensão ao mudar de modo.
+Files `.puml` / `.plantuml` / `.pu` / `.wsd` open by default in the **custom editor** (`CustomTextEditorProvider`), which combines text editing and PlantUML rendering **in the same tab**, without side preview panels or new editor groups created by the extension when switching modes.
 
-### Modos suportados
+### Supported modes
 
-| Modo       | Identificador | Comportamento |
-|-----------|---------------|---------------|
-| Só código | `code`        | Só o painel de texto (textarea) na Webview; diagrama oculto e pedidos de render cancelados. |
-| Código + diagrama | `split` | Texto e diagrama em duas colunas dentro da mesma Webview. |
-| Só diagrama | `preview`   | Só a área do diagrama; código oculto (o `TextDocument` continua a existir e a ser actualizado em segundo plano). |
+| Mode | ID | Behavior |
+|------|-----|----------|
+| Code only | `code` | Text panel (textarea) only in the webview; diagram hidden and render requests cancelled. |
+| Code + diagram | `split` | Text and diagram in two columns inside the same webview. |
+| Diagram only | `preview` | Diagram area only; code hidden (`TextDocument` still exists and updates in the background). |
 
-A mudança de modo **não** abre novos separadores, **não** usa `createWebviewPanel` e **não** força split do grupo de editores do VS Code.
+Changing mode does **not** open new tabs, does **not** use `createWebviewPanel`, and does **not** force VS Code editor group splits.
 
 ---
 
@@ -48,16 +48,16 @@ Setting `plantumlViewer.showWebviewToolbar` (default **on**): top row with **thr
 
 ## 3. Editor Architecture
 
-### Porquê `CustomTextEditorProvider`
+### Why `CustomTextEditorProvider`
 
-- A API associa uma **única** `WebviewPanel` por instância de editor ao `TextDocument` do ficheiro.
-- Permite actualizar HTML/CSS internos (layout dos três modos) **in-place**, mantendo undo/redo do documento via `WorkspaceEdit` a partir do textarea.
+- The API binds a **single** `WebviewPanel` per editor instance to the file’s `TextDocument`.
+- Allows updating internal HTML/CSS (layout for the three modes) **in place**, while preserving undo/redo via `WorkspaceEdit` from the textarea.
 
-### Porquê deixar de usar `createWebviewPanel`
+### Why not `createWebviewPanel`
 
-- `WebviewPanel` cria um separador ou coluna **adicional** na área de editores, incompatível com o requisito de alternar modos **no mesmo separador** sem splits externos.
+- `WebviewPanel` creates an **extra** tab or column in the editor area, which conflicts with switching modes **in the same tab** without external splits.
 
-### Registo
+### Registration
 
 - `viewType`: `plantumlViewer.plantumlEditor`
 - `supportsMultipleEditorsPerDocument`: `false`
@@ -67,63 +67,63 @@ Setting `plantumlViewer.showWebviewToolbar` (default **on**): top row with **thr
 
 ## 4. State Model
 
-### Modo por documento
+### Mode per document
 
-- Chave: `plantumlViewer.viewModesByUri` em `workspaceState` (mapa `uri.toString()` → `"code" | "split" | "preview"`).
-- Defeito ao abrir um URI sem entrada: `split`.
+- Key: `plantumlViewer.viewModesByUri` in `workspaceState` (map `uri.toString()` → `"code" | "split" | "preview"`).
+- Default when opening a URI with no entry: `split`.
 
-### Sessão em memória (`PlantumlCustomEditorSession`)
+### In-memory session (`PlantumlCustomEditorSession`)
 
-- Por cada `resolveCustomTextEditor`: referência ao `TextDocument`, `WebviewPanel`, modo actual (espelha o persistido após `setMode`), `AbortController` do pedido SVG actual, debounce de refresh, e flag `applyingFromWebview` para evitar loops com `onDidChangeTextDocument`.
+- Per `resolveCustomTextEditor`: reference to `TextDocument`, `WebviewPanel`, current mode (mirrors persisted state after `setMode`), `AbortController` for the current SVG request, refresh debounce, and `applyingFromWebview` flag to avoid loops with `onDidChangeTextDocument`.
 
-### Sessão activa
+### Active session
 
-- `PlantumlCustomEditorProvider.activePlantumlSession()` resolve o separador activo via `TabInputCustom`; usada por toggle, refresh, export na barra de estado, e `syncViewModeContext`.
+- `PlantumlCustomEditorProvider.activePlantumlSession()` resolves the active tab via `TabInputCustom`; used by toggle, refresh, export on the status bar, and `syncViewModeContext`.
 
 ---
 
 ## 5. Command Flow
 
-| Comando | Efeito |
+| Command | Effect |
 |---------|--------|
-| `toggleViewMode` | Ciclo `code` → `split` → `preview` → `code` na sessão do custom editor activo; actualiza `plantumlViewer.viewMode` (contexto). |
-| `viewModeCode` / `viewModeSplit` / `viewModePreview` | Definem modo directamente (paleta / atalhos); mesma lógica que antes. |
-| `openPreview` | Equivalente a `viewModeSplit`. |
-| `refreshPreview` | `refreshDiagram('manual')` na sessão do custom editor activo. |
-| `exportDiagram` | Usa `getActivePlantumlDocument()`, fluxo de export existente. |
+| `toggleViewMode` | Cycles `code` → `split` → `preview` → `code` on the active custom editor session; updates `plantumlViewer.viewMode` (context). |
+| `viewModeCode` / `viewModeSplit` / `viewModePreview` | Set mode directly (palette / keybindings); same logic as before. |
+| `openPreview` | Equivalent to `viewModeSplit`. |
+| `refreshPreview` | `refreshDiagram('manual')` on the active custom editor session. |
+| `exportDiagram` | Uses `getActivePlantumlDocument()`, existing export flow. |
 
 ---
 
 ## 6. Rendering Strategy
 
-### HTML da Webview
+### Webview HTML
 
-- **Shell** (`customEditorHtml.ts`): `#app` → barra opcional `#wvToolbar` + `#root`; `#codePane` com scroll, `<pre><code>` colorido (`puml-*`) e textarea transparente; mensagens `highlight` / `highlightHtml` + `requestHighlight` ↔ `webviewHighlight.ts`.
-- **Actualizações**: `init` (inclui `showWebviewToolbar`), `mode`, `code`, `diagram`; `uiCommand` da webview → `setMode` (payload `mode`), `refresh`, `export`.
+- **Shell** (`customEditorHtml.ts`): `#app` → optional toolbar `#wvToolbar` + `#root`; `#codePane` with scroll, colored `<pre><code>` (`puml-*`) and transparent textarea; `highlight` / `highlightHtml` messages + `requestHighlight` ↔ `webviewHighlight.ts`.
+- **Updates**: `init` (includes `showWebviewToolbar`), `mode`, `code`, `diagram`; `uiCommand` from webview → `setMode` (payload `mode`), `refresh`, `export`.
 
-### Diagrama
+### Diagram
 
-- Reutiliza `expandPlantUmlIncludes`, `applyDiagramPreamble`, `fetchSvgDiagram` e fragmentos `buildDiagramLoadingMountContent` / `buildDiagramMountContent` (`preview/html.ts`).
-- SVG sanitizado como antes; pan/arrasto re-ligado após cada `innerHTML` no contentor do diagrama.
+- Reuses `expandPlantUmlIncludes`, `applyDiagramPreamble`, `fetchSvgDiagram` and fragments `buildDiagramLoadingMountContent` / `buildDiagramMountContent` (`preview/html.ts`).
+- SVG sanitized as before; pan/drag re-bound after each `innerHTML` in the diagram container.
 
-### Texto
+### Text
 
-- O utilizador edita no textarea; `docChange` (debounce ~400 ms na Webview) aplica `WorkspaceEdit.replace` em todo o documento.
-- Alterações externas ao documento propagam-se com `postMessage` tipo `code` e disparam refresh debounced se `autoRefresh` e modo ≠ `code`.
+- User edits in the textarea; `docChange` (debounce ~400 ms in webview) applies `WorkspaceEdit.replace` for the whole document.
+- External document changes propagate via `postMessage` type `code` and trigger debounced refresh if `autoRefresh` and mode ≠ `code`.
 
 ---
 
 ## 7. Constraints
 
-- Manter o utilizador no **mesmo separador** do editor personalizado ao mudar modo.
-- **Sem** painéis laterais dedicados à pré-visualização.
-- **Sem** duplicar na UI os cinco comandos principais (prioridade: `editor/title`; CodeLens e barra de estado opcionais e desligados por defeito).
+- Keep the user in the **same tab** of the custom editor when changing mode.
+- **No** dedicated side preview panels.
+- **Do not** duplicate all five main commands in the UI (priority: `editor/title`; CodeLens and status bar optional and off by default for duplication).
 
 ---
 
-## 8. Future Improvements (optional)
+## 8. Future improvements (optional)
 
-- Scroll sincronizado entre código e diagrama em modo `split`.
-- Controlos de zoom na UI (além de `previewZoom` nas definições).
-- Exportação com pré-visualização de destino ou formatos extra.
-- Edição incremental (ranges) em vez de substituir o documento inteiro a cada `docChange`.
+- Synchronized scroll between code and diagram in `split` mode.
+- Zoom controls in the UI (beyond `previewZoom` in settings).
+- Export with destination preview or extra formats.
+- Incremental editing (ranges) instead of replacing the whole document on each `docChange`.
