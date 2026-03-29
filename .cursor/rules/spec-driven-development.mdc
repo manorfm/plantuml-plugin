@@ -1,0 +1,35 @@
+---
+description: Fluxo Specification-Driven Development (spec → plan → tasks antes de código)
+alwaysApply: true
+---
+
+# SDD neste repositório
+
+## Fontes de verdade
+
+1. **`SPECIFICATION.md`** — visão global, princípios, restrições, índice de features.
+2. **`specs/<feature>/spec.md`** — intenção e critérios de aceitação da feature (sem detalhe de implementação).
+3. **`specs/<feature>/plan.md`** — decisão técnica e arquitectura; referencia o `spec.md`.
+4. **`specs/<feature>/tasks.md`** — passos de execução verificáveis.
+
+Ficheiro global único: **`SPECIFICATION.md`** na raiz (case-sensitive em Linux; ferramentas que esperem `specification.md` devem ser configuradas para este caminho ou usar symlink local opcional).
+
+## Regra de implementação
+
+**Não** implementar nem alterar `src/**`, `package.json` contributes, ou testes funcionais sem:
+
+1. Identificar a **feature** em `specs/` (ou criar pasta nova com os três ficheiros).
+2. Actualizar ou validar **`spec.md`** face ao pedido.
+3. Actualizar **`plan.md`** se a decisão técnica mudar.
+4. Actualizar **`tasks.md`** com o trabalho restante ou concluído.
+
+Validar o código contra o **`spec.md`** da feature antes de considerar a tarefa fechada.
+
+## O que não fazer
+
+- Não usar apenas o monólito global como único guia para mudanças finas de comportamento (sempre cruzar com a feature).
+- Não duplicar parágrafos longos entre global e feature: o global permanece curto; o detalhe fica no `spec.md` da feature.
+
+## Ordem sugerida com skills do projeto
+
+Após alinhar spec/plan/tasks da feature: skill **vscode-plantuml-extension** (domínio extensão), **typescript-vscode-extension** (código TS), **vscode-extension-testing** (testes).

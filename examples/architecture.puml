@@ -1,0 +1,68 @@
+@startuml
+!theme plain
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam defaultFontName Verdana
+
+title plantuml-viewer v0.8.1 — architecture (this repo)
+
+left to right direction
+
+package "Entrada" {
+  component [extension.ts] as EXT <<TypeScript>>
+}
+
+package "Editor personalizado" {
+  component [plantumlCustomEditorProvider.ts] as CEP
+  component [customEditorHtml.ts] as CEH
+}
+
+package "Pré-visualização (fragmentos)" {
+  component [html.ts] as HTML
+}
+
+package "PlantUML / rede" {
+  component [serverClient.ts] as SC
+  component [expandIncludes.ts] as INC
+  component [exportDiagram.ts] as EXP
+  component [sourceTransform.ts] as ST
+}
+
+component [plantumlConfig.ts] as CFG
+
+package "Utilitários" {
+  component [abortSignal.ts] as AB
+  component [debounce.ts] as DB
+}
+
+cloud "Servidor PlantUML\n(HTTP)" as SRV #LightBlue
+
+EXT --> CEP : registerCustomEditorProvider\n+ comandos
+EXT --> EXP : exportar
+
+CEP --> CEH : shell Webview
+CEP --> INC : expande !include
+CEP --> ST : diagramPreamble
+CEP --> SC : fetchSvgDiagram
+CEP --> HTML : fragmentos diagrama
+CEP --> CFG
+
+EXP --> INC
+EXP --> ST
+EXP --> SC : SVG / PNG
+EXP --> CEP : documento activo
+
+SC --> SRV : GET (URL codificada)\nou POST (diagrama grande)
+
+note right of CEP
+  **Modos:** só código | código+diagrama | só diagrama
+  Persistência: **plantumlViewer.viewModesByUri** (workspace)
+  Mesmo separador; sem WebviewPanel extra
+end note
+
+note bottom of SRV
+  **Dependência npm:** plantuml-encoder
+  Codificação deflate + encode64
+end note
+
+@enduml

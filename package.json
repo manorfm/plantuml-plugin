@@ -1,0 +1,203 @@
+{
+  "name": "plantuml-viewer",
+  "displayName": "PlantUML Viewer",
+  "description": "Preview PlantUML diagrams (.puml) in the editor with live updates.",
+  "version": "0.8.1",
+  "publisher": "local",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/local/plantuml-viewer.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "activationEvents": [
+    "onCustomEditor:plantumlViewer.plantumlEditor",
+    "onLanguage:plantuml",
+    "onCommand:plantumlViewer.toggleViewMode",
+    "onCommand:plantumlViewer.viewModeCode",
+    "onCommand:plantumlViewer.viewModeSplit",
+    "onCommand:plantumlViewer.viewModePreview",
+    "onCommand:plantumlViewer.openPreview",
+    "onCommand:plantumlViewer.refreshPreview",
+    "onCommand:plantumlViewer.exportDiagram"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "plantumlViewer.plantumlEditor",
+        "displayName": "PlantUML Viewer",
+        "selector": [
+          {
+            "filenamePattern": "*.puml"
+          },
+          {
+            "filenamePattern": "*.plantuml"
+          },
+          {
+            "filenamePattern": "*.pu"
+          },
+          {
+            "filenamePattern": "*.wsd"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "languages": [
+      {
+        "id": "plantuml",
+        "aliases": [
+          "PlantUML",
+          "plantuml"
+        ],
+        "extensions": [
+          ".puml",
+          ".plantuml",
+          ".pu",
+          ".wsd"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "plantumlViewer.toggleViewMode",
+        "title": "PlantUML: Cycle view mode",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "plantumlViewer.viewModeCode",
+        "title": "PlantUML: Code only",
+        "icon": "$(symbol-file)"
+      },
+      {
+        "command": "plantumlViewer.viewModeSplit",
+        "title": "PlantUML: Code and diagram",
+        "icon": "$(split-horizontal)"
+      },
+      {
+        "command": "plantumlViewer.viewModePreview",
+        "title": "PlantUML: Diagram only",
+        "icon": "$(preview)"
+      },
+      {
+        "command": "plantumlViewer.openPreview",
+        "title": "PlantUML: Open preview"
+      },
+      {
+        "command": "plantumlViewer.refreshPreview",
+        "title": "PlantUML: Refresh preview",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "plantumlViewer.exportDiagram",
+        "title": "PlantUML: Export diagram…",
+        "icon": "$(save-as)"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "plantumlViewer.toggleViewMode",
+          "when": "activeCustomEditorId == plantumlViewer.plantumlEditor && plantumlViewer.viewMode == code",
+          "group": "navigation@1",
+          "icon": "$(symbol-file)",
+          "title": "Switch to split (code + diagram)"
+        },
+        {
+          "command": "plantumlViewer.toggleViewMode",
+          "when": "activeCustomEditorId == plantumlViewer.plantumlEditor && plantumlViewer.viewMode == split",
+          "group": "navigation@1",
+          "icon": "$(split-horizontal)",
+          "title": "Switch to preview (diagram only)"
+        },
+        {
+          "command": "plantumlViewer.toggleViewMode",
+          "when": "activeCustomEditorId == plantumlViewer.plantumlEditor && plantumlViewer.viewMode == preview",
+          "group": "navigation@1",
+          "icon": "$(preview)",
+          "title": "Switch to code only"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "PlantUML Viewer",
+      "properties": {
+        "plantumlViewer.serverUrl": {
+          "type": "string",
+          "default": "https://www.plantuml.com/plantuml",
+          "description": "PlantUML server base URL **without** a trailing slash (requests use `/svg`, `/png`). Default: official server. Diagram text is sent over HTTP—avoid for confidential data. For local/private use, e.g. Docker `http://127.0.0.1:8080`. Empty value falls back to the default public URL."
+        },
+        "plantumlViewer.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Refresh the diagram while editing (debounced) when a diagram mode is active."
+        },
+        "plantumlViewer.requestTimeoutMs": {
+          "type": "number",
+          "default": 45000,
+          "minimum": 1000,
+          "maximum": 600000,
+          "description": "Maximum time (ms) for each HTTP request to the PlantUML server before aborting."
+        },
+        "plantumlViewer.previewZoom": {
+          "type": "number",
+          "default": 1,
+          "minimum": 0.25,
+          "maximum": 3,
+          "description": "Diagram scale in the webview (1 = 100%)."
+        },
+        "plantumlViewer.diagramPreamble": {
+          "type": "string",
+          "default": "",
+          "description": "Optional text inserted before the diagram (after !include expansion), e.g. !theme or skinparam, depending on server support."
+        },
+        "plantumlViewer.showStatusBarActions": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Refresh and Export in the status bar when the PlantUML custom editor tab is active."
+        },
+        "plantumlViewer.showModeCodeLens": {
+          "type": "boolean",
+          "default": false,
+          "description": "Optional: “Refresh diagram” CodeLens in the text editor only (Reopen with Text Editor). Does not duplicate the title or webview toolbar."
+        },
+        "plantumlViewer.showWebviewToolbar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Mode / Refresh / Export controls in the top-right of the custom editor webview."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js",
+    "vscode:package": "vsce package",
+    "lint": "eslint src --ext ts"
+  },
+  "dependencies": {
+    "plantuml-encoder": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.14.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.2.0",
+    "glob": "^7.2.3",
+    "mocha": "^10.4.0",
+    "typescript": "^5.5.0"
+  }
+}

@@ -1,0 +1,27 @@
+---
+description: Contexto do repositório plantuml-viewer e uso dos Cursor Skills do projeto
+alwaysApply: true
+---
+
+# Projeto: extensão PlantUML Viewer (VS Code)
+
+- **Especificação global:** `SPECIFICATION.md` na raiz; **features:** `specs/<feature>/spec.md`, `plan.md`, `tasks.md` (ver `specs/README.md`). Fluxo SDD: regra `spec-driven-development.mdc`.
+- **Skills do Cursor** (pastas com `SKILL.md` em `.cursor/skills/`): o agente deve abrir o skill adequado ao tipo de alteração.
+
+| Skill | Quando aplicar |
+|-------|----------------|
+| **vscode-plantuml-extension** | Webview, servidor PlantUML, comandos `plantumlViewer.*`, fluxo `.puml`, `media/`. |
+| **typescript-vscode-extension** | Qualquer `src/**/*.ts`, tipos, `Disposable`, configuração `plantumlViewer`, padrões da API VS Code. |
+| **vscode-extension-testing** | `src/test/**`, `runTest`, Mocha, `@vscode/test-electron`, scripts `npm test`. |
+
+Ordem sugerida para novas features: identificar feature em `specs/` (spec → plan → tasks) → ler `SPECIFICATION.md` → **vscode-plantuml-extension** → **typescript-vscode-extension**; para testes, **vscode-extension-testing**.
+
+## Versionamento e releases (SemVer)
+
+Cada **alteração pedida** que afecte o produto (código, requisitos, `package.json`, ou comportamento da extensão) deve:
+
+1. Incrementar `version` em `package.json` segundo **Semantic Versioning** (detalhe em `specs/engineering-release/` e resumo em `SPECIFICATION.md` §8).
+2. Executar `npm run vscode:package` na raiz do repositório e confirmar `plantuml-viewer-<versão>.vsix`.
+3. Actualizar referências à versão no `README.md` quando existirem exemplos de instalação `.vsix`.
+
+Não concluir uma entrega de alteração ao código ou contrato da extensão sem bump de versão e geração do pacote quando a tarefa constituir uma release (explícita ou implícita).
