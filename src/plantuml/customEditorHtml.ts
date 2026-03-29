@@ -1,7 +1,6 @@
 /**
  * Static HTML document for {@link vscode.CustomTextEditorProvider}.
- * Mode, text, diagram updates via `postMessage`; optional top toolbar posts `uiCommand`
- * (three icon mode buttons + refresh/export).
+ * Mode, text, diagram updates via `postMessage`; syntax colouring via highlight layer + `highlight` / `highlightHtml` messages.
  */
 export function getPlantumlCustomEditorShellHtml(): string {
   const csp = [
@@ -98,6 +97,58 @@ export function getPlantumlCustomEditorShellHtml(): string {
       flex-direction: column;
       border-right: 1px solid var(--vscode-panel-border, rgba(128, 128, 128, 0.35));
     }
+    #codeScroll {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: auto;
+    }
+    #codeSizer {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      box-sizing: border-box;
+    }
+    #codePre {
+      margin: 0;
+      padding: 8px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      tab-size: 4;
+      font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
+      font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
+      line-height: var(--vscode-editor-line-height, 1.4);
+      color: var(--vscode-editor-foreground);
+      box-sizing: border-box;
+    }
+    #codePre code {
+      display: block;
+    }
+    #codePre .puml-cmt {
+      color: var(
+        --vscode-editorLineNumber-activeForeground,
+        var(--vscode-descriptionForeground, #6a9955)
+      );
+      font-style: italic;
+    }
+    #codePre .puml-kw {
+      color: var(--vscode-symbolIcon-keywordForeground, #c586c0);
+    }
+    #codePre .puml-dir {
+      color: var(--vscode-editor-preprocessorForeground, #9cdcfe);
+    }
+    #codePre .puml-str {
+      color: var(--vscode-editor-stringForeground, #ce9178);
+    }
+    #codePre .puml-num {
+      color: var(--vscode-editor-numberForeground, #b5cea8);
+    }
+    #codePre .puml-arrow {
+      color: var(--vscode-editor-symbolForeground, #569cd6);
+    }
+    #codePre .puml-at {
+      color: var(--vscode-symbolIcon-classForeground, #4ec9b0);
+      font-weight: 600;
+    }
     body.mode-code #codePane {
       flex: 1 1 100%;
       border-right: none;
@@ -116,9 +167,12 @@ export function getPlantumlCustomEditorShellHtml(): string {
       flex: 1 1 100%;
     }
     #src {
-      flex: 1 1 auto;
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100%;
-      min-height: 0;
+      height: 100%;
+      margin: 0;
       resize: none;
       border: none;
       outline: none;
@@ -127,9 +181,19 @@ export function getPlantumlCustomEditorShellHtml(): string {
       font-family: var(--vscode-editor-font-family, var(--vscode-font-family));
       font-size: var(--vscode-editor-font-size, var(--vscode-font-size));
       line-height: var(--vscode-editor-line-height, 1.4);
-      background: var(--vscode-editor-background);
-      color: var(--vscode-editor-foreground);
+      background: transparent;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      caret-color: var(--vscode-editor-foreground);
       tab-size: 4;
+      overflow: hidden;
+      z-index: 1;
+    }
+    #src::selection {
+      background: var(
+        --vscode-editor-selectionBackground,
+        rgba(100, 150, 200, 0.35)
+      );
     }
     #diagramMount {
       flex: 1 1 auto;
@@ -284,7 +348,14 @@ export function getPlantumlCustomEditorShellHtml(): string {
       </div>
     </div>
     <div id="root">
-      <div id="codePane"><textarea id="src" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea></div>
+      <div id="codePane">
+        <div id="codeScroll">
+          <div id="codeSizer">
+            <pre id="codePre" aria-hidden="true"><code id="codeHl"></code></pre>
+            <textarea id="src" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+          </div>
+        </div>
+      </div>
       <div id="diagramPane"><div id="diagramMount"></div></div>
     </div>
   </div>
@@ -292,12 +363,36 @@ export function getPlantumlCustomEditorShellHtml(): string {
 (function () {
   var vscode = acquireVsCodeApi();
   var ta = document.getElementById("src");
+  var codeHl = document.getElementById("codeHl");
+  var codePre = document.getElementById("codePre");
+  var codeSizer = document.getElementById("codeSizer");
+  var codeScroll = document.getElementById("codeScroll");
   var mount = document.getElementById("diagramMount");
   var toolbar = document.getElementById("wvToolbar");
   var pushTimer = null;
+  var hlTimer = null;
   function pushDoc() {
     vscode.postMessage({ type: "docChange", text: ta.value });
   }
+  function layoutCodeLayers() {
+    var sh = codePre.offsetHeight;
+    ta.style.height = sh + "px";
+    codeSizer.style.minHeight = Math.max(sh, codeScroll.clientHeight) + "px";
+  }
+  function applyHighlight(html) {
+    codeHl.innerHTML = html || "<br/>";
+    requestAnimationFrame(layoutCodeLayers);
+  }
+  function scheduleHighlight() {
+    clearTimeout(hlTimer);
+    hlTimer = setTimeout(function () {
+      vscode.postMessage({ type: "requestHighlight", text: ta.value });
+    }, 24);
+  }
+  ta.addEventListener("wheel", function (e) {
+    codeScroll.scrollTop += e.deltaY;
+    e.preventDefault();
+  }, { passive: false });
   function syncWebviewModeToolbar(mode) {
     ["code", "split", "preview"].forEach(function (m) {
       var el = document.getElementById(
@@ -310,6 +405,7 @@ export function getPlantumlCustomEditorShellHtml(): string {
     });
   }
   ta.addEventListener("input", function () {
+    scheduleHighlight();
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushDoc, 400);
   });
@@ -352,14 +448,28 @@ export function getPlantumlCustomEditorShellHtml(): string {
       } else {
         mount.innerHTML = "";
       }
+      if (m.highlightHtml) {
+        applyHighlight(m.highlightHtml);
+      } else {
+        scheduleHighlight();
+      }
     }
     if (m.type === "mode") {
       document.body.className = "mode-" + m.mode;
       syncWebviewModeToolbar(m.mode);
+      scheduleHighlight();
     }
     if (m.type === "code") {
       if (ta.value !== m.text) ta.value = m.text;
       ta.readOnly = !!m.readOnly;
+      if (m.highlightHtml) {
+        applyHighlight(m.highlightHtml);
+      } else {
+        scheduleHighlight();
+      }
+    }
+    if (m.type === "highlight") {
+      applyHighlight(m.html);
     }
     if (m.type === "diagram") {
       if (m.kind === "clear") {

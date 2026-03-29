@@ -55,7 +55,8 @@ Permitir **visualizar e exportar** diagramas PlantUML a partir do editor, com UI
 | Servidor inacessível / timeout | Mensagem clara; sem hang indefinido. |
 | Includes locais | Resolução ou erro/ciclo reportado. |
 | Exportar | Escolha SVG/PNG e gravação em disco. |
-| Modos de vista | Só código / split / foco diagrama no **mesmo separador**; `toggleViewMode` em `editor/title`; na Webview, três ícones de modo + refresh/export (`view-modes`, `docs/editor-behavior-spec.md`). |
+| Modos de vista | Só código / split / foco diagrama no **mesmo separador**; `toggleViewMode` em `editor/title`; toolbar Webview opcional (`view-modes`, `docs/editor-behavior-spec.md`). |
+| Edição de texto | Realce no custom editor (Webview) + TextMate no editor de texto; **Format document** (`plantuml-text-editor`). |
 
 ---
 
@@ -70,6 +71,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | Webview, tema, zoom, pan, loading | `specs/preview-rendering/` |
 | Modos, persistência, foco | `specs/view-modes/` |
 | Exportação ficheiro | `specs/export-diagram/` |
+| Sintaxe, formatação, script `vsix` | `specs/plantuml-text-editor/` |
 | Testes, VSIX, SemVer | `specs/engineering-release/` |
 
 **Backlog** (não especificado ao nível de aceitação neste global): pré-visualização PNG no painel; `!includeurl` local ou mensagem dedicada.
@@ -95,13 +97,14 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | `specs/preview-rendering/` | Pré-visualização Webview |
 | `specs/view-modes/` | Modos de vista |
 | `specs/export-diagram/` | Exportação SVG/PNG |
+| `specs/plantuml-text-editor/` | Sintaxe TextMate, formatação, script `vsix` |
 | `specs/engineering-release/` | Qualidade e release |
 
 ---
 
 ## 6. Setup e referências
 
-- **Comandos de desenvolvimento:** `npm install`, `npm run compile`, `npm test`, `npm run vscode:package` — critérios em `specs/engineering-release/`.
+- **Comandos de desenvolvimento:** `npm install`, `npm run compile`, `npm test`, `npm run vscode:package`, `npm run vsix` — critérios em `specs/engineering-release/`.
 - **PlantUML Server:** [plantuml.com — servidor](https://plantuml.com/pt/server)
 - **Webview / theming:** [VS Code Webview](https://code.visualstudio.com/api/extension-guides/webview#theming-webview-content)
 

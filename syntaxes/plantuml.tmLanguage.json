@@ -1,0 +1,86 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "PlantUML",
+  "scopeName": "source.plantuml",
+  "patterns": [
+    { "include": "#comment-line" },
+    { "include": "#preprocessor" },
+    { "include": "#diagram-delimiters" },
+    { "include": "#string-double" },
+    { "include": "#arrows" },
+    { "include": "#keywords-block" },
+    { "include": "#keywords-uml" },
+    { "include": "#numbers" }
+  ],
+  "repository": {
+    "comment-line": {
+      "name": "comment.line.apostrophe.plantuml",
+      "begin": "^\\s*'",
+      "end": "$"
+    },
+    "preprocessor": {
+      "patterns": [
+        {
+          "name": "keyword.control.import.plantuml",
+          "match": "(?i)^\\s*!(include|includeurl|import|define|undef|if|ifdef|ifndef|else|endif|enddef)\\b"
+        },
+        {
+          "name": "keyword.other.preprocessor.plantuml",
+          "match": "(?i)^\\s*!(theme|pragma|version|log|dump|assert)\\b"
+        }
+      ]
+    },
+    "diagram-delimiters": {
+      "patterns": [
+        {
+          "name": "keyword.control.diagram.plantuml",
+          "match": "(?i)@(start|end)(uml|mindmap|wbs|json|salt|latex|math|gantt|flowchart|creole|ditaa|ebnf)\\b"
+        },
+        {
+          "name": "keyword.other.document.plantuml",
+          "match": "(?i)^\\s*(title|caption|newpage|scale|rotate|skinparam)\\b"
+        },
+        {
+          "name": "keyword.other.document.plantuml",
+          "match": "(?i)^\\s*(legend|endlegend|header|endheader|footer|endfooter)\\b"
+        },
+        {
+          "name": "keyword.other.document.plantuml",
+          "match": "(?i)^\\s*(top\\s+to\\s+bottom\\s+direction|left\\s+to\\s+right\\s+direction)\\s*$"
+        }
+      ]
+    },
+    "string-double": {
+      "name": "string.quoted.double.plantuml",
+      "begin": "\"",
+      "end": "\"",
+      "patterns": [
+        { "name": "constant.character.escape.plantuml", "match": "\\\\." }
+      ]
+    },
+    "arrows": {
+      "name": "keyword.operator.arrow.plantuml",
+      "match": "(->>|->|-->|<--|==+>|\\.\\.\\.+[>]?|--|\\.[\\.]{2,})"
+    },
+    "keywords-block": {
+      "name": "keyword.control.block.plantuml",
+      "match": "(?i)\\b(alt|else|end|opt|loop|par|break|critical|group|activate|deactivate|destroy|create|autonumber|fork|again|partition|ref|return|start|stop)\\b"
+    },
+    "keywords-uml": {
+      "patterns": [
+        {
+          "name": "keyword.other.plantuml",
+          "match": "(?i)\\b(as|participant|actor|boundary|control|entity|database|collections|queue|usecase|interface|enum|package|namespace|node|folder|frame|cloud|artifact|card|together|hide|show|remove|restore|note|abstract|static|extends|implements)\\b"
+        },
+        {
+          "name": "storage.type.plantuml",
+          "match": "(?i)\\b(class|interface|enum|abstract\\s+class|exception|annotation)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "name": "constant.numeric.plantuml",
+      "match": "\\b\\d+(\\.\\d+)?\\b"
+    }
+  }
+}

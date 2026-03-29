@@ -35,7 +35,8 @@ Confirme que o serviço responde no URL configurado em **Definições → PlantU
 - Expansão de **`!include`** com caminhos relativos ao ficheiro: `ficheiro.puml`, `<ficheiro.puml>`, `"caminho com espaços.puml"`. **`!includeurl`** não é expandido localmente (mantém-se a linha).
 - **Diagramas muito grandes:** quando a URL GET codificada fica demasiado longa, a extensão usa **POST** com o texto do diagrama para `/svg` ou `/png` (plantuml-server; versões muito antigas podem não suportar).
 - **Exportação** do diagrama para ficheiro **SVG** ou **PNG** (via servidor).
-- Empacotamento **`.vsix`** para instalação offline (`npm run vscode:package`).
+- **Realce de sintaxe PlantUML** (TextMate embebido) e **Format document** no **editor de texto**; comando **PlantUML: Format document** também com o **PlantUML Viewer** (custom editor) activo. Ver `specs/plantuml-text-editor/`.
+- Empacotamento **`.vsix`**: `npm run vscode:package` ou **`npm run vsix`** (compila + empacota).
 
 ## Exemplo de diagrama (este projeto)
 
@@ -84,13 +85,13 @@ O pacote **`.vsix`** contém a extensão pronta a instalar (gerado com `npm run 
 
 ```bash
 # Visual Studio Code
-code --install-extension ./plantuml-viewer-0.8.1.vsix
+code --install-extension ./plantuml-viewer-0.9.1.vsix
 
 # Cursor (se o CLI estiver no PATH)
-cursor --install-extension ./plantuml-viewer-0.8.1.vsix
+cursor --install-extension ./plantuml-viewer-0.9.1.vsix
 ```
 
-Substitua `0.8.1` pela versão real do ficheiro gerado (`version` em `package.json`). Use o caminho absoluto ou relativo correcto até ao `.vsix`.
+Substitua `0.9.1` pela versão real do ficheiro gerado (`version` em `package.json`). Use o caminho absoluto ou relativo correcto até ao `.vsix`.
 
 Depois da instalação, confirme que a extensão aparece em **Extensions** com o nome **PlantUML Viewer** (publisher `local`, salvo tenha alterado o `publisher` no `package.json`).
 
@@ -128,12 +129,13 @@ Abra a pasta do repositório no editor e use **Run → Start Debugging** (F5). A
 | **PlantUML: Open preview** | Igual a **Code and diagram**. |
 | **PlantUML: Refresh preview** | Re-render no custom editor activo (também na status bar e na webview). |
 | **PlantUML: Export diagram…** | Exporta SVG/PNG (também na status bar e na webview). |
+| **PlantUML: Format document** | Formata e indenta o `.puml` (custom editor activo ou **Format Document** no editor de texto). |
 
 **Where the buttons are:** **Editor title:** só **ciclo de modo** (`navigation@1`, ícone conforme `plantumlViewer.viewMode`). **Status bar:** Refresh + Export com custom editor activo. **Webview:** barra superior opcional com **três ícones de modo** + refresh e export em ícone. **CodeLens:** só refresh no editor de texto, se `showModeCodeLens`.
 
 **Onde está o diagrama:** no **mesmo separador** que o código (modo split ou só diagrama). Documentação técnica: **`docs/editor-behavior-spec.md`**.
 
-**Realce de sintaxe:** no editor personalizado o código é um **textarea** temático (tokens da Webview), não a colorização TextMate completa. Para o editor de texto clássico com gramática de terceiros, use **Reopen Editor With… → Text Editor**.
+**Realce de sintaxe:** no **PlantUML Viewer** (custom editor), a área de código usa uma camada `<pre>` colorida por baixo da textarea (`webviewHighlight.ts`). Com **Reopen Editor With… → Text Editor**, a **gramática TextMate** (`syntaxes/plantuml.tmLanguage.json`) também colore o buffer `plantuml`.
 
 ## Configuração (`plantumlViewer.*`)
 
@@ -163,6 +165,7 @@ npm run compile    # compilar TypeScript
 npm run watch      # compilar em modo observação
 npm test           # testes (Extension Host + Mocha)
 npm run vscode:package   # gera plantuml-viewer-*.vsix
+npm run vsix             # compile + vsce package (atalho)
 ```
 
 Documentação técnica detalhada: **`SPECIFICATION.md`** na raiz; comportamento do editor: **`docs/editor-behavior-spec.md`** (inclui versionamento SemVer em `SPECIFICATION.md` e geração do `.vsix`).

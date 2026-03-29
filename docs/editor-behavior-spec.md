@@ -98,7 +98,7 @@ Setting `plantumlViewer.showWebviewToolbar` (default **on**): top row with **thr
 
 ### HTML da Webview
 
-- **Shell** (`customEditorHtml.ts`): `#app` → barra opcional `#wvToolbar` + `#root` (`#codePane`, `#diagramPane`), textarea `#src`, `#diagramMount`.
+- **Shell** (`customEditorHtml.ts`): `#app` → barra opcional `#wvToolbar` + `#root`; `#codePane` com scroll, `<pre><code>` colorido (`puml-*`) e textarea transparente; mensagens `highlight` / `highlightHtml` + `requestHighlight` ↔ `webviewHighlight.ts`.
 - **Actualizações**: `init` (inclui `showWebviewToolbar`), `mode`, `code`, `diagram`; `uiCommand` da webview → `setMode` (payload `mode`), `refresh`, `export`.
 
 ### Diagrama

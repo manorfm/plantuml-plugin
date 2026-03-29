@@ -2,7 +2,7 @@
   "name": "plantuml-viewer",
   "displayName": "PlantUML Viewer",
   "description": "Preview PlantUML diagrams (.puml) in the editor with live updates.",
-  "version": "0.8.1",
+  "version": "0.9.1",
   "publisher": "local",
   "license": "MIT",
   "repository": {
@@ -25,7 +25,8 @@
     "onCommand:plantumlViewer.viewModePreview",
     "onCommand:plantumlViewer.openPreview",
     "onCommand:plantumlViewer.refreshPreview",
-    "onCommand:plantumlViewer.exportDiagram"
+    "onCommand:plantumlViewer.exportDiagram",
+    "onCommand:plantumlViewer.formatDocument"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -66,6 +67,13 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "grammars": [
+      {
+        "language": "plantuml",
+        "scopeName": "source.plantuml",
+        "path": "./syntaxes/plantuml.tmLanguage.json"
+      }
+    ],
     "commands": [
       {
         "command": "plantumlViewer.toggleViewMode",
@@ -100,6 +108,11 @@
         "command": "plantumlViewer.exportDiagram",
         "title": "PlantUML: Export diagram…",
         "icon": "$(save-as)"
+      },
+      {
+        "command": "plantumlViewer.formatDocument",
+        "title": "PlantUML: Format document",
+        "icon": "$(code)"
       }
     ],
     "menus": {
@@ -184,6 +197,7 @@
     "pretest": "npm run compile",
     "test": "node ./out/test/runTest.js",
     "vscode:package": "vsce package",
+    "vsix": "npm run compile && vsce package",
     "lint": "eslint src --ext ts"
   },
   "dependencies": {

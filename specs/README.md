@@ -25,6 +25,7 @@ Alterações de comportamento devem **actualizar primeiro** o `spec.md` (ou o gl
 | [`view-modes/`](./view-modes/) | Três modos de vista, persistência, foco e barra do editor. |
 | [`export-diagram/`](./export-diagram/) | Exportação SVG/PNG para ficheiro. |
 | [`engineering-release/`](./engineering-release/) | Testes, empacotamento `.vsix`, SemVer e coerência de documentação. |
+| [`plantuml-text-editor/`](./plantuml-text-editor/) | Realce de sintaxe TextMate, formatação/indentação, script `vsix`. |
 
 ## Convenções de nomes
 

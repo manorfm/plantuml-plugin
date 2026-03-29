@@ -4,6 +4,7 @@ import { PlantumlCustomEditorProvider } from "./plantuml/plantumlCustomEditorPro
 import { registerOptionalPlantumlCodeLens } from "./plantumlModeCodeLens";
 import { PlantumlStatusBarController } from "./plantumlStatusBar";
 import { readPlantumlConfig } from "./plantumlConfig";
+import { registerPlantumlFormatting } from "./plantuml/plantumlFormatting";
 
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new PlantumlCustomEditorProvider(context);
@@ -20,6 +21,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(new PlantumlStatusBarController());
   context.subscriptions.push(registerOptionalPlantumlCodeLens(context));
+  context.subscriptions.push(registerPlantumlFormatting());
 
   context.subscriptions.push(
     vscode.window.tabGroups.onDidChangeTabs(() => {

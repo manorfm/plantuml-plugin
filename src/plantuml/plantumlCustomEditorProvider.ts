@@ -10,6 +10,7 @@ import {
   buildDiagramLoadingMountContent,
   buildDiagramMountContent,
 } from "../preview/html";
+import { highlightPlantumlToHtml } from "./webviewHighlight";
 
 const VIEW_MODES_KEY = "plantumlViewer.viewModesByUri";
 const VIEW_MODE_CONTEXT = "plantumlViewer.viewMode";
@@ -201,6 +202,7 @@ export class PlantumlCustomEditorProvider
 type WebviewFromHostMessage =
   | { type: "ready" }
   | { type: "docChange"; text: string }
+  | { type: "requestHighlight"; text: string }
   | {
       type: "uiCommand";
       command: "setMode" | "refresh" | "export";
@@ -231,10 +233,12 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
       if (this.applyingFromWebview) {
         return;
       }
+      const docText = e.document.getText();
       this.webview.postMessage({
         type: "code",
-        text: e.document.getText(),
+        text: docText,
         readOnly: false,
+        highlightHtml: highlightPlantumlToHtml(docText),
       });
       if (readPlantumlConfig().autoRefresh && this.mode !== "code") {
         this.debouncedRefresh();
@@ -254,6 +258,13 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
 
   async handleMessage(msg: WebviewFromHostMessage): Promise<void> {
     if (!msg || typeof msg !== "object") {
+      return;
+    }
+    if (msg.type === "requestHighlight") {
+      this.webview.postMessage({
+        type: "highlight",
+        html: highlightPlantumlToHtml(msg.text),
+      });
       return;
     }
     if (msg.type === "uiCommand") {
@@ -278,6 +289,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
         text,
         readOnly: false,
         showWebviewToolbar: cfg.showWebviewToolbar,
+        highlightHtml: highlightPlantumlToHtml(text),
         diagramHtml:
           this.mode === "code" ? undefined : buildDiagramLoadingMountContent(),
       });
