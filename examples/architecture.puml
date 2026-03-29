@@ -4,24 +4,24 @@ skinparam shadowing false
 skinparam roundcorner 8
 skinparam defaultFontName Verdana
 
-title plantuml-viewer v0.10.3 — architecture (this repo)
+title plantuml-plugin-manorfm v0.10.7 — architecture (this repo)
 
 left to right direction
 
-package "Entrada" {
+package "Entry" {
   component [extension.ts] as EXT <<TypeScript>>
 }
 
-package "Editor personalizado" {
+package "Custom editor" {
   component [plantumlCustomEditorProvider.ts] as CEP
   component [customEditorHtml.ts] as CEH
 }
 
-package "Pré-visualização (fragmentos)" {
+package "Preview (fragments)" {
   component [html.ts] as HTML
 }
 
-package "PlantUML / rede" {
+package "PlantUML / network" {
   component [serverClient.ts] as SC
   component [expandIncludes.ts] as INC
   component [exportDiagram.ts] as EXP
@@ -30,39 +30,39 @@ package "PlantUML / rede" {
 
 component [plantumlConfig.ts] as CFG
 
-package "Utilitários" {
+package "Utilities" {
   component [abortSignal.ts] as AB
   component [debounce.ts] as DB
 }
 
-cloud "Servidor PlantUML\n(HTTP)" as SRV #LightBlue
+cloud "PlantUML server\n(HTTP)" as SRV #LightBlue
 
-EXT --> CEP : registerCustomEditorProvider\n+ comandos
-EXT --> EXP : exportar
+EXT --> CEP : registerCustomEditorProvider\n+ commands
+EXT --> EXP : export
 
-CEP --> CEH : shell Webview
-CEP --> INC : expande !include
+CEP --> CEH : webview shell
+CEP --> INC : expand !include
 CEP --> ST : diagramPreamble
 CEP --> SC : fetchSvgDiagram
-CEP --> HTML : fragmentos diagrama
+CEP --> HTML : diagram fragments
 CEP --> CFG
 
 EXP --> INC
 EXP --> ST
 EXP --> SC : SVG / PNG
-EXP --> CEP : documento activo
+EXP --> CEP : active document
 
-SC --> SRV : GET (URL codificada)\nou POST (diagrama grande)
+SC --> SRV : GET (encoded URL)\nor POST (large diagram)
 
 note right of CEP
-  **Modos:** só código | código+diagrama | só diagrama
-  Persistência: **plantumlViewer.viewModesByUri** (workspace)
-  Mesmo separador; sem WebviewPanel extra
+  **Modes:** code only | code+diagram | diagram only
+  Persistence: **plantumlViewer.viewModesByUri** (workspace)
+  Same tab; no extra WebviewPanel
 end note
 
 note bottom of SRV
-  **Dependência npm:** plantuml-encoder
-  Codificação deflate + encode64
+  **npm dependency:** plantuml-encoder
+  Deflate + base64 encoding
 end note
 
 @enduml

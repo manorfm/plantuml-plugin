@@ -7,7 +7,7 @@ description: Implementa e evolui a extensão VS Code PlantUML Viewer neste repos
 
 ## Contexto
 
-- Raiz do projeto: extensão TypeScript compilada para `out/`.
+- Raiz do projeto: extensão TypeScript compilada para `dist/` (`main`: `./dist/extension.js`).
 - Visão global: [SPECIFICATION.md](../../../SPECIFICATION.md); **features:** pasta [specs/](../../../specs/) (`spec.md` → `plan.md` → `tasks.md` antes de código).
 - Skills relacionados: **typescript-vscode-extension** (TS e API VS Code), **vscode-extension-testing** (suíte de testes).
 - `package.json` define linguagem `plantuml`, comandos `openPreview`, `refreshPreview`, `exportDiagram`, e configurações `serverUrl`, `autoRefresh`, `requestTimeoutMs`, `previewZoom`, `diagramPreamble`.

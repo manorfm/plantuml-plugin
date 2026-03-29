@@ -7,6 +7,13 @@ import { invalidatePlantumlConfigCache, readPlantumlConfig } from "./plantumlCon
 import { registerPlantumlFormatting } from "./plantuml/plantumlFormatting";
 
 export function activate(context: vscode.ExtensionContext): void {
+  /** Entry command for marketplace/docs: opens PlantUML preview (code + diagram) using existing custom editor. */
+  context.subscriptions.push(
+    vscode.commands.registerCommand("plantuml.preview", () =>
+      PlantumlCustomEditorProvider.setViewMode(context, "split")
+    )
+  );
+
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration("plantumlViewer")) {

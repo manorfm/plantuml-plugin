@@ -1,17 +1,17 @@
 {
-  "name": "plantuml-viewer",
-  "displayName": "PlantUML Viewer",
-  "description": "Preview PlantUML diagrams in the editor: live SVG, code/split/diagram modes, export PNG/SVG. Uses a configurable HTTP server; diagram text is sent over the network unless you use a local server.",
+  "name": "plantuml-plugin-manorfm",
+  "displayName": "PlantUML Plugin",
+  "description": "Edit and preview PlantUML diagrams in VS Code: split view, live SVG, PNG/SVG export. Diagrams are rendered by your chosen PlantUML server.",
   "icon": "media/icon.png",
-  "version": "0.10.5",
-  "publisher": "local",
+  "version": "0.10.7",
+  "publisher": "manorfm",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/local/plantuml-viewer.git"
+    "url": "https://github.com/manorfm/plantuml-plugin.git"
   },
   "bugs": {
-    "url": "https://github.com/local/plantuml-viewer/issues"
+    "url": "https://github.com/manorfm/plantuml-plugin/issues"
   },
   "galleryBanner": {
     "color": "#1b4332",
@@ -20,25 +20,17 @@
   "keywords": [
     "plantuml",
     "uml",
-    "diagram",
-    "preview",
-    "svg",
-    "png",
-    "puml",
-    "sequence diagram",
-    "class diagram",
-    "architecture",
-    "render",
-    "export"
+    "diagram"
   ],
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Programming Languages",
     "Visualization"
   ],
   "activationEvents": [
+    "onCommand:plantuml.preview",
     "onCustomEditor:plantumlViewer.plantumlEditor",
     "onLanguage:plantuml",
     "onCommand:plantumlViewer.toggleViewMode",
@@ -50,12 +42,12 @@
     "onCommand:plantumlViewer.exportDiagram",
     "onCommand:plantumlViewer.formatDocument"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "customEditors": [
       {
         "viewType": "plantumlViewer.plantumlEditor",
-        "displayName": "PlantUML Viewer",
+        "displayName": "PlantUML Plugin",
         "selector": [
           {
             "filenamePattern": "*.puml"
@@ -97,6 +89,11 @@
       }
     ],
     "commands": [
+      {
+        "command": "plantuml.preview",
+        "title": "Preview PlantUML",
+        "icon": "$(preview)"
+      },
       {
         "command": "plantumlViewer.toggleViewMode",
         "title": "PlantUML: Cycle view mode",
@@ -163,12 +160,12 @@
       ]
     },
     "configuration": {
-      "title": "PlantUML Viewer",
+      "title": "PlantUML Plugin",
       "properties": {
         "plantumlViewer.serverUrl": {
           "type": "string",
           "default": "https://www.plantuml.com/plantuml",
-          "description": "PlantUML server base URL **without** a trailing slash (requests use `/svg`, `/png`). Default: official server. Diagram text is sent over HTTP—avoid for confidential data. For local/private use, e.g. Docker `http://127.0.0.1:8080`. Empty value falls back to the default public URL."
+          "description": "Base URL of your PlantUML server (no trailing slash). Empty uses the built-in default. Use a server you trust; diagram content is sent there for rendering."
         },
         "plantumlViewer.autoRefresh": {
           "type": "boolean",
@@ -209,7 +206,7 @@
         "plantumlViewer.showModeCodeLens": {
           "type": "boolean",
           "default": false,
-          "description": "Optional: “Refresh diagram” CodeLens in the text editor only (Reopen with Text Editor). Does not duplicate the title or webview toolbar."
+          "description": "Show a refresh CodeLens in the plain text editor (when you open the file as text instead of the custom editor)."
         },
         "plantumlViewer.showWebviewToolbar": {
           "type": "boolean",
@@ -224,7 +221,7 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
-    "test": "node ./out/test/runTest.js",
+    "test": "node ./dist/test/runTest.js",
     "vscode:package": "vsce package",
     "vsix": "npm run compile && vsce package",
     "lint": "eslint src --ext ts"
@@ -236,7 +233,7 @@
     "@types/glob": "^7.2.0",
     "@types/mocha": "^10.0.0",
     "@types/node": "^20.14.0",
-    "@types/vscode": "^1.85.0",
+    "@types/vscode": "^1.80.0",
     "@vscode/test-electron": "^2.4.0",
     "@vscode/vsce": "^3.2.0",
     "glob": "^7.2.3",

@@ -35,7 +35,7 @@ src/test/
 
 ```json
 "scripts": {
-  "test": "node ./out/test/runTest.js"
+  "test": "node ./dist/test/runTest.js"
 }
 ```
 

@@ -4,7 +4,7 @@
 
 ## Arquitectura
 
-- **Compilação:** TypeScript → `out/`, entrada da extensão aponta para `out/extension.js`.
+- **Compilação:** TypeScript → `dist/`, entrada da extensão aponta para `dist/extension.js`.
 - **Testes:** `@vscode/test-electron` + Mocha; ficheiros em `src/test/suite/`.
 - **Pacote:** `vsce package` (script `vscode:package`), `.vscodeignore` controla conteúdo do VSIX; dependência `plantuml-encoder` deve estar presente no pacote.
 

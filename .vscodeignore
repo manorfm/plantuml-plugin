@@ -1,3 +1,4 @@
+out/**
 .vscode/**
 .vscode-test/**
 src/**
@@ -8,5 +9,5 @@ src/**
 SPECIFICATION.md
 specs/**
 **/.cursor/**
-out/test/**
+dist/test/**
 media/icon_2.jpg
