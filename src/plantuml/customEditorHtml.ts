@@ -149,6 +149,10 @@ export function getPlantumlCustomEditorShellHtml(): string {
       color: var(--vscode-symbolIcon-classForeground, #4ec9b0);
       font-weight: 600;
     }
+    #codePre .puml-plain {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
     body.mode-code #codePane {
       flex: 1 1 100%;
       border-right: none;
@@ -391,6 +395,7 @@ export function getPlantumlCustomEditorShellHtml(): string {
   }
   ta.addEventListener("wheel", function (e) {
     codeScroll.scrollTop += e.deltaY;
+    codeScroll.scrollLeft += e.deltaX;
     e.preventDefault();
   }, { passive: false });
   function syncWebviewModeToolbar(mode) {

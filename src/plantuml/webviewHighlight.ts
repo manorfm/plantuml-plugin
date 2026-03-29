@@ -107,11 +107,17 @@ function highlightLineTokens(line: string): string {
   return out;
 }
 
+/** Beyond this, emit a single escaped block to keep the Webview responsive. */
+const HIGHLIGHT_MAX_LINES = 8000;
+
 /** Full document → HTML (use `<br/>` between lines for `<pre>` block). */
 export function highlightPlantumlToHtml(text: string): string {
   if (text.length === 0) {
     return "<br/>";
   }
   const lines = text.split(/\n/);
+  if (lines.length > HIGHLIGHT_MAX_LINES) {
+    return `<span class="puml-plain">${escapeHtml(text)}</span>`;
+  }
   return lines.map(highlightPlantumlLine).join("<br/>");
 }

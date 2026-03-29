@@ -3,10 +3,18 @@ import { runExportDiagramPick } from "./plantuml/exportDiagram";
 import { PlantumlCustomEditorProvider } from "./plantuml/plantumlCustomEditorProvider";
 import { registerOptionalPlantumlCodeLens } from "./plantumlModeCodeLens";
 import { PlantumlStatusBarController } from "./plantumlStatusBar";
-import { readPlantumlConfig } from "./plantumlConfig";
+import { invalidatePlantumlConfigCache, readPlantumlConfig } from "./plantumlConfig";
 import { registerPlantumlFormatting } from "./plantuml/plantumlFormatting";
 
 export function activate(context: vscode.ExtensionContext): void {
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("plantumlViewer")) {
+        invalidatePlantumlConfigCache();
+      }
+    })
+  );
+
   const provider = new PlantumlCustomEditorProvider(context);
   context.subscriptions.push(
     vscode.window.registerCustomEditorProvider(

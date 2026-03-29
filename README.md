@@ -85,13 +85,13 @@ O pacote **`.vsix`** contém a extensão pronta a instalar (gerado com `npm run 
 
 ```bash
 # Visual Studio Code
-code --install-extension ./plantuml-viewer-0.9.1.vsix
+code --install-extension ./plantuml-viewer-0.10.2.vsix
 
 # Cursor (se o CLI estiver no PATH)
-cursor --install-extension ./plantuml-viewer-0.9.1.vsix
+cursor --install-extension ./plantuml-viewer-0.10.2.vsix
 ```
 
-Substitua `0.9.1` pela versão real do ficheiro gerado (`version` em `package.json`). Use o caminho absoluto ou relativo correcto até ao `.vsix`.
+Substitua `0.10.2` pela versão real do ficheiro gerado (`version` em `package.json`). Use o caminho absoluto ou relativo correcto até ao `.vsix`.
 
 Depois da instalação, confirme que a extensão aparece em **Extensions** com o nome **PlantUML Viewer** (publisher `local`, salvo tenha alterado o `publisher` no `package.json`).
 

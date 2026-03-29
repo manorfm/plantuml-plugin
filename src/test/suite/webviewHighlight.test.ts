@@ -29,4 +29,11 @@ suite("webviewHighlight", () => {
     assert.ok(h.includes("<br/>"));
     assert.ok(h.includes("puml-at"));
   });
+
+  test("very large documents use plain escape path", () => {
+    const lines = Array.from({ length: 8001 }, () => "a");
+    const h = highlightPlantumlToHtml(lines.join("\n"));
+    assert.ok(h.includes("puml-plain"));
+    assert.ok(!h.includes("puml-kw"));
+  });
 });

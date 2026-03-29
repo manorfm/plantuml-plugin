@@ -1,8 +1,12 @@
 export function debounce(
   fn: () => void,
-  ms: number
+  ms: number | (() => number)
 ): (() => void) & { dispose: () => void } {
   let timer: ReturnType<typeof setTimeout> | undefined;
+  const delayMs = (): number => {
+    const v = typeof ms === "function" ? ms() : ms;
+    return Number.isFinite(v) && v >= 0 ? v : 0;
+  };
   const wrapped = (() => {
     if (timer !== undefined) {
       clearTimeout(timer);
@@ -10,7 +14,7 @@ export function debounce(
     timer = setTimeout(() => {
       timer = undefined;
       fn();
-    }, ms);
+    }, delayMs());
   }) as (() => void) & { dispose: () => void };
 
   wrapped.dispose = () => {

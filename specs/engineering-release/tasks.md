@@ -2,12 +2,12 @@
 
 Mapeamento: **S** = [spec.md](./spec.md), **P** = [plan.md](./plan.md).
 
-_Última verificação documentada: release **0.9.1**._
+_Última verificação documentada: release **0.10.2**._
 
 ## Cada alteração de produto
 
-- [x] **T-REL-1 (S: aceitação 2–3, P: vsce)** `version` 0.9.1; `npm run vscode:package` / `npm run vsix` → `plantuml-viewer-0.9.1.vsix`.
-- [x] **T-REL-2 (S: aceitação 3)** README actualizado com exemplos `.vsix` 0.9.1.
+- [x] **T-REL-1 (S: aceitação 2–3, P: vsce)** `version` 0.10.2; `npm run vscode:package` / `npm run vsix` → `plantuml-viewer-0.10.2.vsix`.
+- [x] **T-REL-2 (S: aceitação 3)** README actualizado com exemplos `.vsix` 0.10.2.
 - [x] **T-REL-3 (S: aceitação 1, P: testes)** `npm run compile` e `npm test` sem falhas (executado na entrega).
 
 ## Manutenção contínua

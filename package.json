@@ -2,7 +2,7 @@
   "name": "plantuml-viewer",
   "displayName": "PlantUML Viewer",
   "description": "Preview PlantUML diagrams (.puml) in the editor with live updates.",
-  "version": "0.9.1",
+  "version": "0.10.2",
   "publisher": "local",
   "license": "MIT",
   "repository": {
@@ -152,6 +152,13 @@
           "type": "boolean",
           "default": true,
           "description": "Refresh the diagram while editing (debounced) when a diagram mode is active."
+        },
+        "plantumlViewer.autoRefreshDelayMs": {
+          "type": "number",
+          "default": 500,
+          "minimum": 50,
+          "maximum": 30000,
+          "description": "Delay in milliseconds before auto-refresh runs after you stop typing (custom editor)."
         },
         "plantumlViewer.requestTimeoutMs": {
           "type": "number",

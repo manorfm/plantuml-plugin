@@ -1,9 +1,11 @@
 import * as vscode from "vscode";
 import { getPlantumlCustomEditorShellHtml } from "./customEditorHtml";
-import { expandPlantUmlIncludes } from "./expandIncludes";
+import { expandPlantUmlIncludesCached } from "./expandIncludes";
 import { fetchSvgDiagram } from "./serverClient";
 import { applyDiagramPreamble } from "./sourceTransform";
-import { readPlantumlConfig } from "../plantumlConfig";
+import {
+  readPlantumlConfig,
+} from "../plantumlConfig";
 import { isPlantumlEditorDocument } from "../util/plantumlEditor";
 import { debounce } from "../util/debounce";
 import {
@@ -11,16 +13,23 @@ import {
   buildDiagramMountContent,
 } from "../preview/html";
 import { highlightPlantumlToHtml } from "./webviewHighlight";
+import {
+  diagramCacheKey,
+  getCachedDiagram,
+  setCachedDiagram,
+} from "./diagramSvgCache";
 
 const VIEW_MODES_KEY = "plantumlViewer.viewModesByUri";
 const VIEW_MODE_CONTEXT = "plantumlViewer.viewMode";
-const DEBOUNCE_MS = 500;
 
 const MODE_CYCLE: PlantumlViewMode[] = ["code", "split", "preview"];
 
 export type PlantumlViewMode = "code" | "split" | "preview";
 
-function loadViewModes(
+let viewModesMemento: vscode.Memento | undefined;
+let viewModesCache: Record<string, PlantumlViewMode> | undefined;
+
+function loadViewModesFromStorage(
   memento: vscode.Memento
 ): Record<string, PlantumlViewMode> {
   const raw = memento.get<Record<string, string>>(VIEW_MODES_KEY, {});
@@ -31,6 +40,19 @@ function loadViewModes(
     }
   }
   return out;
+}
+
+function loadViewModes(
+  memento: vscode.Memento
+): Record<string, PlantumlViewMode> {
+  if (viewModesMemento !== memento) {
+    viewModesMemento = memento;
+    viewModesCache = undefined;
+  }
+  if (!viewModesCache) {
+    viewModesCache = loadViewModesFromStorage(memento);
+  }
+  return viewModesCache;
 }
 
 function readViewMode(
@@ -51,6 +73,7 @@ async function writeViewMode(
 ): Promise<void> {
   const next = { ...loadViewModes(memento), [uri.toString()]: mode };
   await memento.update(VIEW_MODES_KEY, next);
+  viewModesCache = next;
 }
 
 export class PlantumlCustomEditorProvider
@@ -212,6 +235,8 @@ type WebviewFromHostMessage =
 class PlantumlCustomEditorSession implements vscode.Disposable {
   private mode: PlantumlViewMode;
   private applyingFromWebview = false;
+  /** Skip echoing document text back to the Webview after a `docChange` apply. */
+  private skipPostToWebviewOnce = false;
   private abort: AbortController | undefined;
   private readonly debouncedRefresh: ReturnType<typeof debounce>;
   private readonly docSub: vscode.Disposable;
@@ -224,10 +249,17 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
     this.mode = readViewMode(this.context.workspaceState, document.uri);
     this.debouncedRefresh = debounce(() => {
       void this.refreshDiagram("debounce");
-    }, DEBOUNCE_MS);
+    }, () => readPlantumlConfig().autoRefreshDelayMs);
 
     this.docSub = vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() !== this.document.uri.toString()) {
+        return;
+      }
+      if (this.skipPostToWebviewOnce) {
+        this.skipPostToWebviewOnce = false;
+        if (readPlantumlConfig().autoRefresh && this.mode !== "code") {
+          this.debouncedRefresh();
+        }
         return;
       }
       if (this.applyingFromWebview) {
@@ -310,9 +342,18 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
         this.document.positionAt(this.document.getText().length)
       );
       edit.replace(this.document.uri, fullRange, text);
+      this.skipPostToWebviewOnce = true;
       this.applyingFromWebview = true;
-      await vscode.workspace.applyEdit(edit);
-      this.applyingFromWebview = false;
+      try {
+        const ok = await vscode.workspace.applyEdit(edit);
+        if (!ok) {
+          this.skipPostToWebviewOnce = false;
+        }
+      } catch {
+        this.skipPostToWebviewOnce = false;
+      } finally {
+        this.applyingFromWebview = false;
+      }
       if (readPlantumlConfig().autoRefresh && this.mode !== "code") {
         this.debouncedRefresh();
       }
@@ -332,12 +373,15 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
         kind: "html",
         html: buildDiagramLoadingMountContent(),
       });
-      void this.refreshDiagram("mode");
+      void this.refreshDiagram("mode", { skipLoadingBanner: true });
     }
     void PlantumlCustomEditorProvider.syncViewModeContext(this.context);
   }
 
-  async refreshDiagram(reason: string): Promise<void> {
+  async refreshDiagram(
+    reason: string,
+    opts?: { skipLoadingBanner?: boolean }
+  ): Promise<void> {
     if (this.mode === "code") {
       return;
     }
@@ -361,7 +405,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
       return;
     }
 
-    const expanded = await expandPlantUmlIncludes(uri, text);
+    const expanded = await expandPlantUmlIncludesCached(uri, text);
     if (!expanded.ok) {
       this.webview.postMessage({
         type: "diagram",
@@ -380,11 +424,38 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
     this.abort = new AbortController();
     const signal = this.abort.signal;
 
-    this.webview.postMessage({
-      type: "diagram",
-      kind: "html",
-      html: buildDiagramLoadingMountContent(),
-    });
+    const cacheKey = diagramCacheKey(conn.serverUrl, text);
+    const cached = getCachedDiagram(cacheKey);
+    if (cached) {
+      if (cached.kind === "svg") {
+        this.webview.postMessage({
+          type: "diagram",
+          kind: "html",
+          html: buildDiagramMountContent(
+            { svg: cached.svg },
+            { previewZoom: conn.previewZoom }
+          ),
+        });
+      } else {
+        this.webview.postMessage({
+          type: "diagram",
+          kind: "html",
+          html: buildDiagramMountContent(
+            { error: cached.message },
+            { previewZoom: conn.previewZoom }
+          ),
+        });
+      }
+      return;
+    }
+
+    if (!opts?.skipLoadingBanner) {
+      this.webview.postMessage({
+        type: "diagram",
+        kind: "html",
+        html: buildDiagramLoadingMountContent(),
+      });
+    }
 
     const result = await fetchSvgDiagram(conn.serverUrl, text, {
       signal,
@@ -396,6 +467,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
     }
 
     if (result.kind === "svg") {
+      setCachedDiagram(cacheKey, { kind: "svg", svg: result.svg });
       this.webview.postMessage({
         type: "diagram",
         kind: "html",
@@ -405,6 +477,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
         ),
       });
     } else {
+      setCachedDiagram(cacheKey, { kind: "err", message: result.message });
       this.webview.postMessage({
         type: "diagram",
         kind: "html",

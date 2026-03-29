@@ -6,6 +6,8 @@ export type PlantumlConnectionConfig = {
   requestTimeoutMs: number;
   previewZoom: number;
   autoRefresh: boolean;
+  /** Debounce (ms) before auto-refreshing the diagram after edits. */
+  autoRefreshDelayMs: number;
   /** Lines inserted before the diagram (e.g. `!theme plain`). */
   diagramPreamble: string;
   /**
@@ -20,7 +22,13 @@ export type PlantumlConnectionConfig = {
   showWebviewToolbar: boolean;
 };
 
-export function readPlantumlConfig(): PlantumlConnectionConfig {
+let cachedConfig: PlantumlConnectionConfig | undefined;
+
+export function invalidatePlantumlConfigCache(): void {
+  cachedConfig = undefined;
+}
+
+function readPlantumlConfigUncached(): PlantumlConnectionConfig {
   const cfg = vscode.workspace.getConfiguration("plantumlViewer");
   const raw = (cfg.get<string>("serverUrl") ?? "").trim();
   const requestTimeoutMs = cfg.get<number>("requestTimeoutMs", 45_000);
@@ -30,6 +38,12 @@ export function readPlantumlConfig(): PlantumlConnectionConfig {
   }
   previewZoom = Math.min(3, Math.max(0.25, previewZoom));
 
+  let autoRefreshDelayMs = cfg.get<number>("autoRefreshDelayMs", 500);
+  if (!Number.isFinite(autoRefreshDelayMs)) {
+    autoRefreshDelayMs = 500;
+  }
+  autoRefreshDelayMs = Math.min(30_000, Math.max(50, Math.round(autoRefreshDelayMs)));
+
   return {
     serverUrl: raw.length === 0 ? DEFAULT_PLANTUML_SERVER_URL : raw,
     requestTimeoutMs:
@@ -38,9 +52,17 @@ export function readPlantumlConfig(): PlantumlConnectionConfig {
         : 45_000,
     previewZoom,
     autoRefresh: cfg.get<boolean>("autoRefresh", true),
+    autoRefreshDelayMs,
     diagramPreamble: cfg.get<string>("diagramPreamble", "") ?? "",
     showStatusBarActions: cfg.get<boolean>("showStatusBarActions", true),
     showModeCodeLens: cfg.get<boolean>("showModeCodeLens", false),
     showWebviewToolbar: cfg.get<boolean>("showWebviewToolbar", true),
   };
+}
+
+export function readPlantumlConfig(): PlantumlConnectionConfig {
+  if (!cachedConfig) {
+    cachedConfig = readPlantumlConfigUncached();
+  }
+  return cachedConfig;
 }
