@@ -9,7 +9,7 @@ alwaysApply: true
 
 1. **Adicionar ou actualizar testes** em `src/test/suite/` que cubram o novo comportamento ou regressões.
 2. Executar **`npm run compile`** e **`npm test`** (Extension Host).
-3. Executar **`npm run test:coverage:unit`** — o **c8** está configurado em `package.json` → `c8` com **`check-coverage: true`** e limiares mínimos (`lines`, `statements`, `branches`, `functions`). **Não** concluir a tarefa se este comando falhar.
+3. Executar **`npm run test:coverage:unit`** — o **c8** está configurado em `package.json` → `c8` com **`check-coverage: true`** e limiares mínimos (`lines`, `statements`, `branches`, `functions`). Inclui **`architectureImports.test.ts`**: imports proibidos (decoupling do custom editor) e **ausência de ciclos** em `src/` via **madge** (redundante com `npm run lint:deps`, mas falha na mesma suíte). **Não** concluir a tarefa se este comando falhar.
 4. Se a alteração for só em módulos que **não** entram no subset Node (dependem de `vscode` ao carregar), garantir pelo menos cobertão via **`npm test`** e, quando possível, extrair lógica pura para um módulo testável pelo subset.
 
 ## Onde está documentado

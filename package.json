@@ -3,7 +3,7 @@
   "displayName": "PlantUML Plugin",
   "description": "Edit and preview PlantUML diagrams in VS Code: split view, live SVG, PNG/SVG export. Diagrams are rendered by your chosen PlantUML server.",
   "icon": "media/icon.png",
-  "version": "0.11.7",
+  "version": "0.11.10",
   "publisher": "manorfm",
   "license": "MIT",
   "repository": {
@@ -243,10 +243,11 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
     "test": "node ./dist/test/runTest.js",
-    "test:coverage:unit": "npm run compile && c8 node ./node_modules/mocha/bin/mocha --ui tdd --timeout 10000 dist/test/suite/abortSignal.test.js dist/test/suite/customEditorHtml.test.js dist/test/suite/debounce.test.js dist/test/suite/diagramSvgCache.test.js dist/test/suite/formatPlantuml.test.js dist/test/suite/html.test.js dist/test/suite/plantumlConnectionSettings.test.js dist/test/suite/previewZoomWheel.test.js dist/test/suite/serverClient.test.js dist/test/suite/sourceTransform.test.js dist/test/suite/visualRendering.test.js dist/test/suite/webviewHighlight.test.js",
+    "test:coverage:unit": "npm run compile && c8 node ./node_modules/mocha/bin/mocha --ui tdd --timeout 10000 dist/test/suite/abortSignal.test.js dist/test/suite/architectureImports.test.js dist/test/suite/customEditorHtml.test.js dist/test/suite/debounce.test.js dist/test/suite/diagramSvgCache.test.js dist/test/suite/formatPlantuml.test.js dist/test/suite/html.test.js dist/test/suite/plantumlConnectionSettings.test.js dist/test/suite/previewZoomWheel.test.js dist/test/suite/serverClient.test.js dist/test/suite/sourceTransform.test.js dist/test/suite/visualRendering.test.js dist/test/suite/webviewHighlight.test.js",
     "vscode:package": "vsce package",
     "vsix": "npm run compile && vsce package",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts",
+    "lint:deps": "madge --circular --extensions ts src/"
   },
   "dependencies": {
     "plantuml-encoder": "^1.4.0"
@@ -261,6 +262,7 @@
     "glob": "^7.2.3",
     "mocha": "^10.4.0",
     "c8": "^10.1.3",
+    "madge": "^8.0.0",
     "typescript": "^5.5.0"
   },
   "c8": {

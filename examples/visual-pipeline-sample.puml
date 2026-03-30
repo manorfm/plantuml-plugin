@@ -1,4 +1,5 @@
 @startuml
+' Estrutura de módulos: examples/architecture-overview.puml + architecture*.puml (v0.11.10+); ver docs/architecture-diagrams.md.
 title Sample for visual pipeline (sequence)
 
 actor User

@@ -34,7 +34,7 @@ src/test/
 ## Scripts em `package.json`
 
 - **`npm test`** — `node ./dist/test/runTest.js` (Extension Host, suíte completa).
-- **`npm run test:coverage:unit`** — compile + **c8** + Mocha sobre o subset listado no script; **`check-coverage`** e limiares estão em `package.json` → secção `c8`. Deve passar após alterações em `src/**` (ver `.cursor/rules/test-coverage.mdc`).
+- **`npm run test:coverage:unit`** — compile + **c8** + Mocha sobre o subset listado no script; **`check-coverage`** e limiares estão em `package.json` → secção `c8`. Inclui **`architectureImports.test.ts`**: regras tipo ArchUnit (imports proibidos para `plantumlCustomEditorProvider` em módulos do registo de sessão) e **madge** sem ciclos em `src/`. Deve passar após alterações em `src/**` (ver `.cursor/rules/test-coverage.mdc`).
 
 Compilar `src/test` com o mesmo `tsconfig` — [@vscode/test-electron](https://github.com/microsoft/vscode-test).
 

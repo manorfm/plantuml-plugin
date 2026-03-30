@@ -1,0 +1,42 @@
+---
+description: Camadas e responsabilidades do código da extensão; onde colocar ficheiros novos; limitações dos diagramas de exemplo
+alwaysApply: true
+---
+
+# Arquitectura do código (`src/`)
+
+- **Leitura rápida (poucas setas):** `examples/architecture-overview.puml`.
+- **Detalhe por ficheiro:** `examples/architecture.puml` e `architecture-theme-*.puml` (domínio aninhado para reduzir dispersão visual).
+- **Notas:** `docs/architecture-diagrams.md` (imports vs. ciclos, ficheiros na raiz de `src/`, dicas PlantUML).
+
+Os diagramas detalhados ainda **não** listam todos os módulos (ex.: `webviewHighlight.ts`, testes). Ao criar ou mover código, seguir o modelo abaixo.
+
+## Camadas (de fora para dentro)
+
+| Camada | Responsabilidade | Local típico |
+|--------|------------------|--------------|
+| **Composição / entrada** | Registar comandos, custom editor, subscrições; sem lógica de negócio pesada | `extension.ts` (raiz: convenção VS Code / `main` → `dist/extension.js`) |
+| **Funcionalidades de produto** | Custom editor Webview, exportação, formatação, code lens, barra de estado | `plantuml/*`, `plantumlStatusBar.ts`, `plantumlModeCodeLens.ts` (podem migrar para `src/ui/` num refactor sem mudar comportamento) |
+| **Pontes / estado partilhado** | Documento activo no custom editor sem acoplar export ao provider; tipos de modo de vista | `plantuml/plantumlEditorSessionRegistry.ts`, `plantuml/plantumlViewMode.ts` |
+| **Configuração** | Leitura e cache de `plantumlViewer.*` (VS Code) | `plantumlConfig.ts`, normalização em `plantuml/plantumlConnectionSettings.ts` (este último importa URL por defeito de `serverClient` e tipos de tema de `rendering/` — acoplamento consciente; ver `docs/architecture-diagrams.md`) |
+| **Domínio PlantUML (rede + texto + render)** | HTTP ao servidor, includes, transformação de fonte, pipeline visual, HTML de montagem | `plantuml/serverClient.ts`, `expandIncludes.ts`, `sourceTransform.ts`, `plantuml/rendering/*`, `preview/html.ts` |
+| **Utilitários** | Funções reutilizáveis; preferir **módulos sem `vscode`** quando possível (testes e reutilização) | `util/*`, `constants/*` |
+
+## Regras de criação e alteração
+
+1. **Novo comando ou UI** — composição em `extension.ts` (ou comando já existente); implementação em módulo de feature (`plantuml/*` ou ficheiro dedicado na raiz de `src/` se for pequeno e coeso).
+2. **Novo comportamento de rede ou encoding** — `plantuml/serverClient.ts` ou módulos chamados por ele; timeouts via `util/abortSignal.ts` quando aplicável.
+3. **Novo ajuste visual / préâmbulo / SVG** — `plantuml/rendering/*` e `preview/html.ts`; manter alinhado a `specs/visual-rendering-pipeline/`.
+4. **Configuração nova** — chaves em `package.json` + leitura em `plantumlConfig.ts` / `plantumlConnectionSettings.ts`; invalidação de cache quando `plantumlViewer` muda.
+5. **Evitar** — importar `plantumlCustomEditorProvider.ts` só para obter documento activo; usar `plantumlEditorSessionRegistry.ts`.
+
+## Verificação automática
+
+- **`src/test/suite/architectureImports.test.ts`** (subset `npm run test:coverage:unit`) — falha se módulos acordados importarem `plantumlCustomEditorProvider`; se **`plantuml/rendering/**/*.ts`** importar o provider; se **`plantuml/serverClient.ts`** importar `rendering/`; ou se **madge** detectar ciclo em `src/`. Ao adicionar fronteiras, alargar o teste e documentar na feature relevante.
+
+## Esclarecimentos sobre o diagrama de exemplo
+
+- **Utilities** — no grafo de exemplo: `DB→CEP`, `AB→SC`, `PUE` ligado a ESR, EXP, FMT, CL e CEP (imports reais).
+- **Configuração** — pacote com `plantumlConfig` + `plantumlConnectionSettings` (`CFG→PCS`).
+- **`sourceTransform`** — usado directamente por `renderPipeline` (`RP→ST`); o custom editor e a exportação entram no préâmbulo via **RP**, não importando `sourceTransform` directamente.
+- **Rendering vs. rede** — **não** há ciclo ao nível de imports: só `renderPipeline` importa `serverClient` e `sourceTransform`; `serverClient` não importa `plantuml/rendering/*`.

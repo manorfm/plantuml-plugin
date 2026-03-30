@@ -25,6 +25,9 @@ jobs:
       - name: Compile
         run: npm run compile
 
+      - name: Dependency graph (no circular TS imports)
+        run: npm run lint:deps
+
       - name: Run extension tests (Extension Host)
         run: xvfb-run -a npm test
 

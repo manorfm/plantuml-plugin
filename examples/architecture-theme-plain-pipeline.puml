@@ -1,65 +1,118 @@
 @startuml
 ' === Variante A: !theme plain + diagrama SEM skinparam de layout ===
-' O servidor desenha baseline neutro; a extensão PODE injectar skinparams + SVG
-' (plantumlViewer.visualTheme ≠ none, p.ex. modern-dark).
-' Copiado de architecture.puml mas sem nodesep/ranksep/paddings/linetype para não bloquear o pipeline.
-'
+' Visão compacta: examples/architecture-overview.puml
+' Mesma topologia que architecture.puml; sem nodesep/ranksep/… (pipeline visual da extensão).
+' docs/architecture-diagrams.md
 ' !theme = motor PlantUML: https://plantuml.com/theme
 ' Nunca uses aqui: modern-dark, glass, minimal, none (só em Settings).
 !theme plain
 
-title plantuml-plugin — plain + pipeline da extensão (pode aplicar)
+title plantuml-plugin-manorfm v0.11.10 — plain + pipeline da extensão (pode aplicar)
 
 left to right direction
 
-package "Entry" {
+package "Composição (entrada)" {
   component [extension.ts] as EXT <<TypeScript>>
+}
+
+package "Funcionalidades (UI)" {
+  component [plantumlStatusBar.ts] as SBR
+  component [plantumlModeCodeLens.ts] as CL
+  component [plantumlFormatting.ts] as FMT
+}
+
+package "Configuração" {
+  component [plantumlConfig.ts] as CFG
+  component [plantumlConnectionSettings.ts] as PCS
 }
 
 package "Utilities" {
   component [abortSignal.ts] as AB
   component [debounce.ts] as DB
+  component [plantumlEditor.ts] as PUE
+}
+
+package "Session registry" {
+  component [plantumlEditorSessionRegistry.ts] as ESR
+  component [plantumlViewMode.ts] as VM
 }
 
 package "Custom editor" {
   component [plantumlCustomEditorProvider.ts] as CEP
   component [customEditorHtml.ts] as CEH
+  component [diagramSvgCache.ts] as DSC
 }
 
 package "Preview (fragments)" {
   component [html.ts] as HTML
 }
 
-package "PlantUML / network" {
-  component [serverClient.ts] as SC
-  component [expandIncludes.ts] as INC
+package "Domínio PlantUML\n(rede + texto + render + export)" as DOM {
+  package "Rendering" {
+    component [renderPipeline.ts] as RP
+  }
+  package "Rede e texto" {
+    component [serverClient.ts] as SC
+    component [expandIncludes.ts] as INC
+    component [sourceTransform.ts] as ST
+  }
   component [exportDiagram.ts] as EXP
-  component [sourceTransform.ts] as ST
 }
 
-component [plantumlConfig.ts] as CFG
+note bottom of RP
+  Hub plantuml/rendering/*
+  (analyzeDiagram, themes, preamble, SVG)
+end note
 
 cloud "PlantUML server\n(HTTP)" as SRV #LightBlue
 
-EXT --> CEP : activate + commands
-EXT --> EXP : export
+EXT --> CEP : custom editor
+EXT --> SBR
+EXT --> CL
+EXT --> FMT
+EXT --> EXP : comandos
+EXT --> CFG : invalidate cache
 
-CEP --> CEH : webview
+CFG --> PCS : normalize settings
+
+SBR --> CFG
+SBR --> ESR
+CL --> CFG
+CL --> PUE
+FMT --> ESR
+FMT --> PUE
+
+CEP --> CEH : webview shell
 CEP --> INC : !include
-CEP --> ST : preamble
 CEP --> SC : fetch SVG
-CEP --> HTML : HTML mount
+CEP --> HTML : mount
 CEP --> CFG
+CEP --> RP : prepare + enhance
+CEP --> DSC : cache
+CEP --> DB : debounce refresh
+CEP --> ESR : register session
+CEP --> PUE
+CEP --> VM : types
 
-EXP --> INC
-EXP --> ST
-EXP --> SC : media
-EXP --> CEP : active doc
+ESR --> PUE
+ESR --> VM
 
+RP --> SC : fetchSvgDiagram
+RP --> ST : preamble / visual
+
+SC --> AB : timeout
 SC --> SRV : GET / POST
 
+EXP --> INC
+EXP --> SC
+EXP --> RP
+EXP --> ESR : active doc
+EXP --> PUE
+EXP ..> CFG : types + getConfig()
+
 legend bottom
-  Compara com **architecture.puml**: lá há nodesep/ranksep/… → pipeline automático desligado.
+  Compara com **architecture.puml**: lá há nodesep/ranksep/… (layout manual).
+  **architecture-overview.puml** — visão por camadas com poucas setas.
 endlegend
 
 @enduml

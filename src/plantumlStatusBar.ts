@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { PlantumlCustomEditorProvider } from "./plantuml/plantumlCustomEditorProvider";
+import { getActivePlantumlEditorSession } from "./plantuml/plantumlEditorSessionRegistry";
 import { readPlantumlConfig } from "./plantumlConfig";
 
 /**
@@ -49,8 +49,7 @@ export class PlantumlStatusBarController implements vscode.Disposable {
 
   private sync(): void {
     const enabled = readPlantumlConfig().showStatusBarActions;
-    const customActive =
-      PlantumlCustomEditorProvider.activePlantumlSession() !== undefined;
+    const customActive = getActivePlantumlEditorSession() !== undefined;
     const show = enabled && customActive;
     if (show) {
       this.refreshItem.show();

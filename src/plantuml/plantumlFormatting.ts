@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { PlantumlCustomEditorProvider } from "./plantumlCustomEditorProvider";
+import { getActivePlantumlEditorSession } from "./plantumlEditorSessionRegistry";
 import { formatPlantumlSource } from "./formatPlantuml";
 import { isPlantumlEditorDocument } from "../util/plantumlEditor";
 
@@ -18,7 +18,7 @@ function fullDocumentRange(doc: vscode.TextDocument): vscode.Range {
 }
 
 export async function formatActivePlantumlDocument(): Promise<void> {
-  const session = PlantumlCustomEditorProvider.activePlantumlSession();
+  const session = getActivePlantumlEditorSession();
   if (session) {
     const doc = session.document;
     const opts = editorFormatOptionsForDocument(doc.uri);

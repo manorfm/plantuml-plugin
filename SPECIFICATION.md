@@ -74,6 +74,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | Zoom interactivo com roda na área do diagrama | `specs/diagram-wheel-zoom/` |
 | Modos, persistência, foco | `specs/view-modes/` |
 | Exportação ficheiro | `specs/export-diagram/` |
+| Registo de sessão do custom editor (documento activo sem acoplar ao provider) | `specs/editor-session-registry/` |
 | Sintaxe, formatação, script `vsix` | `specs/plantuml-text-editor/` |
 | Testes, VSIX, SemVer | `specs/engineering-release/` |
 

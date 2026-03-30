@@ -1,0 +1,55 @@
+@startuml
+' Visão compacta: poucas setas, leitura por camadas.
+' Detalhe por ficheiro: architecture.puml ou architecture-theme-*.puml
+' Ver docs/architecture-diagrams.md
+!theme plain
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam ArrowThickness 1.2
+skinparam linetype ortho
+
+title plantuml-plugin-manorfm v0.11.10 — camadas (visão leitura)
+
+top to bottom direction
+
+together {
+  package "Composição" as P1 #EEF6EE {
+    component [extension.ts] as EXT <<entry>>
+  }
+  package "Partilhado" as P2 #E8ECF4 {
+    component [config + registo + util] as SHARED <<abstract>>
+  }
+}
+
+package "Funcionalidades (UI)" as P_UI #F4F0E8 {
+  component [barra, code lens, formatação] as UI <<abstract>>
+}
+
+package "Apresentação" as P4 #F8ECEC {
+  component [custom editor + preview Webview] as VIEW <<abstract>>
+}
+
+package "Domínio PlantUML" as P5 #EEEEEE {
+  component [HTTP + texto + render + export] as DOM <<abstract>>
+}
+
+cloud "Servidor PlantUML (HTTP)" as SRV #LightBlue
+
+EXT -down-> SHARED : lê / invalida
+EXT -down-> UI : regista
+EXT -down-> VIEW : regista
+EXT -down-> DOM : comandos export
+
+UI -down-> SHARED
+VIEW -down-> SHARED
+VIEW -down-> DOM : pipeline, fetch, includes
+DOM -down-> SHARED : tipos / sessão\n(via módulos)
+DOM -down-> SRV
+
+legend bottom
+  **Abstract** = vários ficheiros; nomes exactos em **architecture.puml**.
+  **Não** há ciclo RP↔SC: só **renderPipeline** importa **serverClient** (unidireccional).
+  **Partilhado** inclui **plantumlEditorSessionRegistry** (documento activo sem provider).
+endlegend
+
+@enduml

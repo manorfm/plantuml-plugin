@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.11.10] - 2026-03-30
+
+- **Tests:** `architectureImports.test.ts` — `plantuml/rendering/**/*.ts` não importam `plantumlCustomEditorProvider`; `serverClient.ts` não importa `rendering/` (camada HTTP independente do pipeline).
+- **Docs / examples:** títulos dos diagramas `examples/architecture*.puml` e `docs/architecture-diagrams.md` alinhados à versão.
+- **README:** secção **Install from a local `.vsix`** com exemplo `plantuml-plugin-manorfm-0.11.10.vsix` e nota de que o nome segue `package.json` → `version`.
+
+## [0.11.9] - 2026-03-30
+
+- **Tests:** `architectureImports.test.ts` — regras de acoplamento (export / registry / formatação / barra de estado não importam `plantumlCustomEditorProvider`); verificação de **ciclos** em `src/` com **madge** na suíte `test:coverage:unit` (complementa `lint:deps`). Tipos em `src/types/madge.d.ts`.
+- **Docs:** `docs/testing.md`, regra `test-coverage.mdc`, spec `engineering-release`.
+
+## [0.11.8] - 2026-03-30
+
+- **Architecture:** Sessões do custom editor PlantUML registas em `plantumlEditorSessionRegistry.ts`; exportação e formatação já não importam `plantumlCustomEditorProvider` só para obter o documento activo. Tipo `PlantumlViewMode` em `plantumlViewMode.ts`.
+- **CI:** `npm run lint:deps` (madge, dependências circulares em `src/`).
+
 ## [0.11.7] - 2026-03-30
 
 - **Typography:** Default font **DejaVu Sans** (better on typical Linux/Docker PlantUML servers than Segoe UI); skinparams for `ArrowFont*` / `Title*` / `Component*` / `Package*` / `Message*` / `Legend*` with harmonised sizes and slate text colours; SVG post-process adds `font-family` on `text`/`tspan` so labels are not stuck in serif when the server lacks the skinparam font.

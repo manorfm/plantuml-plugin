@@ -12,12 +12,14 @@
 | Layer | What runs | Role |
 |-------|-----------|------|
 | **Unit** | Same subset as `test:coverage:unit` | Pure logic, config normalization, HTML builders, client helpers, mocks where needed. |
+| **Architecture** | `src/test/suite/architectureImports.test.ts` (inside unit runner) | Imports estáticos: módulos que não podem depender de `plantumlCustomEditorProvider` (incl. `plantuml/rendering/**/*.ts`); **`serverClient.ts`** não importa `rendering/`; **madge** confirma zero ciclos em `src/` (complementa `npm run lint:deps` no CI). |
 | **Integration** | `fetch` mocks in the unit runner | SVG/PNG paths, GET/POST fallback, timeouts, error hints. |
 | **Extension Host** | `npm test` | Real `vscode` API: includes, editor detection, extension smoke. |
 
 ## Agents and CI
 
 - Cursor: `.cursor/rules/test-coverage.mdc` (with `src/**` changes: tests + `compile` + `npm test` + `npm run test:coverage:unit`).
+- Diagramas de arquitectura (overview vs. detalhe): `docs/architecture-diagrams.md`.
 - Spec: `specs/engineering-release/spec.md`.
 - GitHub Actions: `.github/workflows/ci.yml` runs `compile`, `npm test`, and `npm run test:coverage:unit` on push/PR to `main`/`master`.
 

@@ -23,6 +23,16 @@ Edit and preview [PlantUML](https://plantuml.com/) diagrams in Visual Studio Cod
 
 Configure the PlantUML server under **Settings** → search **PlantUML Plugin** (default uses the public demo server).
 
+### Install from a local `.vsix`
+
+After `npm run vscode:package` at the repository root, install the generated file (name follows **`version`** in `package.json`; current example: `plantuml-plugin-manorfm-0.11.10.vsix`):
+
+```bash
+code --install-extension plantuml-plugin-manorfm-0.11.10.vsix
+```
+
+You can also open the **Extensions** view in VS Code and choose **Install from VSIX…** from the `⋯` menu.
+
 ### PlantUML `!theme` in the diagram (server)
 
 Only names from the **PlantUML engine** work in your `.puml` file — see the official list at [plantuml.com/theme](https://plantuml.com/theme). Examples (availability depends on server version): `plain`, `cerulean-outline`, `cerulean`, `aws-orange`, `superhero`, `materia`, `metal`, `lightgray`, `cyborg-outline`, …

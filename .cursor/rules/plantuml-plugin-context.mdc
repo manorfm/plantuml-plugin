@@ -6,6 +6,7 @@ alwaysApply: true
 # Projeto: extensão PlantUML Viewer (VS Code)
 
 - **Especificação global:** `SPECIFICATION.md` na raiz; **features:** `specs/<feature>/spec.md`, `plan.md`, `tasks.md` (ver `specs/README.md`). Fluxo SDD: regra `spec-driven-development.mdc`.
+- **Arquitectura de código e criação de módulos:** regra `extension-architecture.mdc` (camadas `src/`, separação de responsabilidades; diagramas em `examples/` são ilustrativos).
 - **Skills do Cursor** (pastas com `SKILL.md` em `.cursor/skills/`): o agente deve abrir o skill adequado ao tipo de alteração.
 
 | Skill | Quando aplicar |

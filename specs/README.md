@@ -25,6 +25,7 @@ Alterações de comportamento devem **actualizar primeiro** o `spec.md` (ou o gl
 | [`diagram-wheel-zoom/`](./diagram-wheel-zoom/) | Zoom in/out com a roda do rato sobre a área do diagrama (limites alinhados a `previewZoom`). |
 | [`view-modes/`](./view-modes/) | Três modos de vista, persistência, foco e barra do editor. |
 | [`export-diagram/`](./export-diagram/) | Exportação SVG/PNG para ficheiro. |
+| [`editor-session-registry/`](./editor-session-registry/) | Registo da sessão do custom editor (documento activo, desacoplamento do provider). |
 | [`engineering-release/`](./engineering-release/) | Testes, empacotamento `.vsix`, SemVer e coerência de documentação. |
 | [`visual-rendering-pipeline/`](./visual-rendering-pipeline/) | Pipeline visual: análise do diagrama, temas, préâmbulo, pós-processamento SVG. |
 | [`plantuml-text-editor/`](./plantuml-text-editor/) | Realce de sintaxe TextMate, formatação/indentação, script `vsix`. |

@@ -5,7 +5,7 @@
 ## Arquitectura
 
 - **Compilação:** TypeScript → `dist/`, entrada da extensão aponta para `dist/extension.js`.
-- **Testes:** `@vscode/test-electron` + Mocha; ficheiros em `src/test/suite/`.
+- **Testes:** `@vscode/test-electron` + Mocha; ficheiros em `src/test/suite/`. Subset Node + c8 inclui `architectureImports.test.ts` (imports proibidos + madge circular em `src/`).
 - **Pacote:** `vsce package` (script `vscode:package`), `.vscodeignore` controla conteúdo do VSIX; dependência `plantuml-encoder` deve estar presente no pacote.
 
 ## Decisões técnicas

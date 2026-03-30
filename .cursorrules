@@ -1,0 +1,5 @@
+# PlantUML Viewer (VS Code) — contexto para agentes
+
+- Especificação e SDD: `SPECIFICATION.md`, `specs/<feature>/`, regra `spec-driven-development.mdc`.
+- **Modelo arquitectural (camadas, onde criar ficheiros, limitações dos diagramas `examples/architecture*.puml`):** ver `.cursor/rules/extension-architecture.mdc`.
+- Skills: `.cursor/skills/` — `vscode-plantuml-extension`, `typescript-vscode-extension`, `vscode-extension-testing`.

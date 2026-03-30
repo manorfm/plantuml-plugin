@@ -24,13 +24,22 @@ import {
   getCachedDiagram,
   setCachedDiagram,
 } from "./diagramSvgCache";
+import {
+  getActivePlantumlDocument as getActivePlantumlDocumentFromRegistry,
+  getActivePlantumlEditorSession,
+  PLANTUML_CUSTOM_EDITOR_VIEW_TYPE,
+  registerPlantumlEditorSession,
+  type PlantumlCustomEditorSessionHandle,
+  unregisterPlantumlEditorSession,
+} from "./plantumlEditorSessionRegistry";
+import type { PlantumlViewMode } from "./plantumlViewMode";
+
+export type { PlantumlViewMode } from "./plantumlViewMode";
 
 const VIEW_MODES_KEY = "plantumlViewer.viewModesByUri";
 const VIEW_MODE_CONTEXT = "plantumlViewer.viewMode";
 
 const MODE_CYCLE: PlantumlViewMode[] = ["code", "split", "preview"];
-
-export type PlantumlViewMode = "code" | "split" | "preview";
 
 let viewModesMemento: vscode.Memento | undefined;
 let viewModesCache: Record<string, PlantumlViewMode> | undefined;
@@ -85,12 +94,7 @@ async function writeViewMode(
 export class PlantumlCustomEditorProvider
   implements vscode.CustomTextEditorProvider
 {
-  static readonly viewType = "plantumlViewer.plantumlEditor";
-
-  private static readonly sessions = new Map<
-    string,
-    PlantumlCustomEditorSession
-  >();
+  static readonly viewType = PLANTUML_CUSTOM_EDITOR_VIEW_TYPE;
 
   constructor(private readonly context: vscode.ExtensionContext) {}
 
@@ -98,15 +102,9 @@ export class PlantumlCustomEditorProvider
    * Custom editor session for the currently active editor tab, if it is this view type.
    */
   static activePlantumlSession(): PlantumlCustomEditorSession | undefined {
-    const tab = vscode.window.tabGroups.activeTabGroup?.activeTab;
-    const input = tab?.input;
-    if (!(input instanceof vscode.TabInputCustom)) {
-      return undefined;
-    }
-    if (input.viewType !== PlantumlCustomEditorProvider.viewType) {
-      return undefined;
-    }
-    return PlantumlCustomEditorProvider.sessions.get(input.uri.toString());
+    return getActivePlantumlEditorSession() as
+      | PlantumlCustomEditorSession
+      | undefined;
   }
 
   /**
@@ -141,15 +139,7 @@ export class PlantumlCustomEditorProvider
    * Active PlantUML document: custom editor tab or text editor.
    */
   static getActivePlantumlDocument(): vscode.TextDocument | undefined {
-    const s = PlantumlCustomEditorProvider.activePlantumlSession();
-    if (s) {
-      return s.document;
-    }
-    const te = vscode.window.activeTextEditor;
-    if (te && isPlantumlEditorDocument(te.document)) {
-      return te.document;
-    }
-    return undefined;
+    return getActivePlantumlDocumentFromRegistry();
   }
 
   static async setViewMode(
@@ -167,7 +157,7 @@ export class PlantumlCustomEditorProvider
       await vscode.commands.executeCommand(
         "vscode.openWith",
         te.document.uri,
-        this.viewType,
+        PLANTUML_CUSTOM_EDITOR_VIEW_TYPE,
         te.viewColumn ?? vscode.ViewColumn.Active
       );
       return;
@@ -206,7 +196,7 @@ export class PlantumlCustomEditorProvider
       webviewPanel
     );
 
-    PlantumlCustomEditorProvider.sessions.set(document.uri.toString(), session);
+    registerPlantumlEditorSession(document.uri.toString(), session);
 
     webviewPanel.webview.onDidReceiveMessage((msg) => {
       void session.handleMessage(msg as WebviewFromHostMessage);
@@ -220,7 +210,7 @@ export class PlantumlCustomEditorProvider
 
     webviewPanel.onDidDispose(() => {
       session.dispose();
-      PlantumlCustomEditorProvider.sessions.delete(document.uri.toString());
+      unregisterPlantumlEditorSession(document.uri.toString());
       void PlantumlCustomEditorProvider.syncViewModeContext(this.context);
     });
 
@@ -239,7 +229,9 @@ type WebviewFromHostMessage =
       mode?: PlantumlViewMode;
     };
 
-class PlantumlCustomEditorSession implements vscode.Disposable {
+class PlantumlCustomEditorSession
+  implements vscode.Disposable, PlantumlCustomEditorSessionHandle
+{
   private mode: PlantumlViewMode;
   private applyingFromWebview = false;
   /** Skip echoing document text back to the Webview after a `docChange` apply. */

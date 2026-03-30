@@ -2,7 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import type { PlantumlConnectionConfig } from "../plantumlConfig";
 import { isPlantumlEditorDocument } from "../util/plantumlEditor";
-import { PlantumlCustomEditorProvider } from "./plantumlCustomEditorProvider";
+import { getActivePlantumlDocument } from "./plantumlEditorSessionRegistry";
 import { expandPlantUmlIncludes } from "./expandIncludes";
 import { fetchPngDiagram, fetchSvgDiagram, type FetchSvgOptions } from "./serverClient";
 import { enhanceSvgString, prepareUmlForServer } from "./rendering/renderPipeline";
@@ -13,7 +13,7 @@ export async function exportActivePlantUmlDiagram(
   format: ExportFormat,
   getConfig: () => PlantumlConnectionConfig
 ): Promise<void> {
-  const doc = PlantumlCustomEditorProvider.getActivePlantumlDocument();
+  const doc = getActivePlantumlDocument();
   if (!doc || !isPlantumlEditorDocument(doc)) {
     void vscode.window.showWarningMessage(
       "Open a PlantUML file (.puml) to export."
