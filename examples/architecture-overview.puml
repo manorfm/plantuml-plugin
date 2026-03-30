@@ -8,7 +8,7 @@ skinparam roundcorner 8
 skinparam ArrowThickness 1.2
 skinparam linetype ortho
 
-title plantuml-plugin-manorfm v0.11.10 — camadas (visão leitura)
+title plantuml-plugin-manorfm v0.11.14 — camadas (visão leitura)
 
 top to bottom direction
 

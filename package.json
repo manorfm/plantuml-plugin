@@ -3,7 +3,7 @@
   "displayName": "PlantUML Plugin",
   "description": "Edit and preview PlantUML diagrams in VS Code: split view, live SVG, PNG/SVG export. Diagrams are rendered by your chosen PlantUML server.",
   "icon": "media/icon.png",
-  "version": "0.11.10",
+  "version": "0.11.14",
   "publisher": "manorfm",
   "license": "MIT",
   "repository": {
@@ -18,9 +18,18 @@
     "theme": "dark"
   },
   "keywords": [
+    "PlantUML",
     "plantuml",
+    "UML",
     "uml",
-    "diagram"
+    "Diagram",
+    "diagram",
+    "diagrams",
+    "visualization",
+    "preview",
+    "SVG",
+    "PNG",
+    "export"
   ],
   "engines": {
     "vscode": "^1.80.0"
@@ -266,9 +275,17 @@
     "typescript": "^5.5.0"
   },
   "c8": {
-    "include": ["dist/**/*.js"],
-    "exclude": ["dist/test/**", "**/*.d.ts"],
-    "reporter": ["text", "lcov"],
+    "include": [
+      "dist/**/*.js"
+    ],
+    "exclude": [
+      "dist/test/**",
+      "**/*.d.ts"
+    ],
+    "reporter": [
+      "text",
+      "lcov"
+    ],
     "report-dir": "coverage",
     "check-coverage": true,
     "lines": 90,

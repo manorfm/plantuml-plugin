@@ -4,6 +4,8 @@ The extension can **enhance** diagrams after the PlantUML server returns SVG, wi
 
 ## Flow
 
+Overview diagram for the README (marketing, not the internal pipeline code): [`examples/visual-pipeline-sample.puml`](../examples/visual-pipeline-sample.puml) → `media/readme-preview.png`.
+
 1. **Analyse** — `analyzeDiagramKind()` infers sequence, class, component, etc. from the source (heuristics).
 2. **Preamble** — `buildVisualPreamble()` emits `skinparam` lines (spacing, `linetype ortho`, soft palette, `defaultFontName`, optional per-`<<stereotype>>` accents, colours) for the selected **visual theme**, merged **before** your `diagramPreamble` so you can still override with your own skinparams.
 3. **Render** — existing HTTP client sends the combined text to `/svg`.

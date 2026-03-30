@@ -17,7 +17,7 @@ skinparam componentPadding 14
 skinparam linetype ortho
 skinparam ArrowThickness 1
 
-title plantuml-plugin-manorfm v0.11.10 — architecture (this repo)
+title plantuml-plugin-manorfm v0.11.14 — architecture (this repo)
 
 left to right direction
 

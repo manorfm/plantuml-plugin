@@ -1,20 +1,45 @@
 @startuml
-' Estrutura de módulos: examples/architecture-overview.puml + architecture*.puml (v0.11.10+); ver docs/architecture-diagrams.md.
-title Sample for visual pipeline (sequence)
+' README / marketplace: source for media/readme-preview.png — regenerate with PlantUML CLI or Docker.
+' Módulos: examples/architecture-overview.puml + architecture*.puml; docs/architecture-diagrams.md.
+
+title PlantUML Viewer — visual pipeline (sample)
+
+skinparam defaultFontName Verdana
 
 actor User
-participant "API Gateway" as Api
-database Postgres
+participant "Custom editor" as Editor
+participant "Preview webview" as Preview
+participant "PlantUML server" as Server
+participant "Export file" as Export
 
-User -> Api: GET /items
-Api -> Postgres: SELECT
-Postgres --> Api: rows
-Api --> User: 200 JSON
+User -> Editor: edit .puml source
+activate Editor
+Editor -> Preview: document text
+activate Preview
+Preview -> Server: encode + POST
+activate Server
+Server --> Preview: SVG
+deactivate Server
+Preview --> User: pan and zoom
+deactivate Preview
+deactivate Editor
+
+== Export ==
+User -> Preview: export PNG or SVG
+activate Preview
+Preview -> Server: same diagram text
+activate Server
+Server --> Preview: image bytes
+deactivate Server
+Preview -> Export: write file
+activate Export
+Export --> User: saved
+deactivate Export
+deactivate Preview
+
+note right of Preview
+  **plantumlViewer** settings
+  choose server URL and visual theme
+end note
 
 @enduml
-
-' With default settings (Settings → PlantUML Viewer):
-' - visualTheme: modern-dark → skinparam spacing + semantic hints
-' - SVG post-processing adds soft shadow + hover CSS
-'
-' Use plantumlViewer.visualTheme = "none" for plain server styling only.

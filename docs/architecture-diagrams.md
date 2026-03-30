@@ -1,6 +1,6 @@
 # Diagramas de arquitectura (exemplos PlantUML)
 
-Versão de referência nos títulos: alinhada a `package.json` (ex.: **v0.11.10**).
+Versão de referência nos títulos: alinhada a `package.json` (ex.: **v0.11.14**).
 
 ## Duas leituras
 

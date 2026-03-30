@@ -15,7 +15,7 @@ skinparam componentPadding 14
 skinparam linetype ortho
 skinparam ArrowThickness 1
 
-title plantuml-plugin-manorfm v0.11.10 — plain + layout manual (diagrama denso)
+title plantuml-plugin-manorfm v0.11.14 — plain + layout manual (diagrama denso)
 
 left to right direction
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.11.14] - 2026-03-30
+
+- **Examples:** `visual-pipeline-sample.puml` simplificado (sem `legend`/`box`/`!theme`/`skinparam` pesados) para renderizar no **servidor público PlantUML** sem HTTP 500; nota curta; `media/readme-preview.png` regenerado.
+
+## [0.11.13] - 2026-03-30
+
+- **README:** Secção **Preview** com imagem `media/readme-preview.png` para o marketplace; esclarecimento: **`modern-dark` em `plantumlViewer.visualTheme` funciona** (defeito da extensão, paleta clara — id histórico); **não** usar `!theme modern-dark` no `.puml`. Tabela de pipeline vs. `!theme` do servidor.
+
+## [0.11.12] - 2026-03-30
+
+- **README:** Imagem de apresentação `media/readme-preview.png` (fluxo editar → pré-visualizar → exportar), gerada a partir de [`examples/visual-pipeline-sample.puml`](examples/visual-pipeline-sample.puml).
+
+## [0.11.11] - 2026-03-30
+
+- **Marketplace:** Palavras-chave ampliadas em `package.json` (`keywords`) para descoberta: PlantUML, UML, Diagram, diagramas, visualização, pré-visualização, SVG, PNG, export.
+
 ## [0.11.10] - 2026-03-30
 
 - **Tests:** `architectureImports.test.ts` — `plantuml/rendering/**/*.ts` não importam `plantumlCustomEditorProvider`; `serverClient.ts` não importa `rendering/` (camada HTTP independente do pipeline).
