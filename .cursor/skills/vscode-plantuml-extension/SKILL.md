@@ -17,7 +17,7 @@ description: Implementa e evolui a extensão VS Code PlantUML Viewer neste repos
 ```
 src/
   extension.ts          # activate / deactivate
-  plantuml/             # CustomTextEditorProvider, serverClient, expandIncludes, export, sourceTransform, customEditorHtml
+  plantuml/             # CustomTextEditorProvider, serverClient, rendering/ (visual pipeline), expandIncludes, export, sourceTransform, customEditorHtml
   preview/              # HTML / fragmentos do diagrama (html.ts)
   plantumlConfig.ts     # leitura central de definições
   util/                 # debounce, combineWithTimeout (abort + timeout)

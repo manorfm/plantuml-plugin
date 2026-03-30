@@ -1,22 +1,14 @@
 @startuml
-' Variantes do mesmo diagrama (comparar temas): architecture-theme-plain-pipeline.puml,
-' architecture-theme-cerulean-outline.puml, architecture-theme-plain-layout-manual.puml
-' !theme = só temas do motor PlantUML (https://plantuml.com/theme), ex. plain.
-' Nunca: modern-dark, glass, minimal, none — esses valores são só em Settings (plantumlViewer.visualTheme).
+' === Variante A: !theme plain + diagrama SEM skinparam de layout ===
+' O servidor desenha baseline neutro; a extensão PODE injectar skinparams + SVG
+' (plantumlViewer.visualTheme ≠ none, p.ex. modern-dark).
+' Copiado de architecture.puml mas sem nodesep/ranksep/paddings/linetype para não bloquear o pipeline.
+'
+' !theme = motor PlantUML: https://plantuml.com/theme
+' Nunca uses aqui: modern-dark, glass, minimal, none (só em Settings).
 !theme plain
-skinparam shadowing false
-skinparam roundcorner 10
-skinparam defaultFontName Verdana
 
-' Layout: mais espaço entre nós e pacotes (diagramas densos)
-skinparam nodesep 100
-skinparam ranksep 85
-skinparam packagePadding 26
-skinparam componentPadding 14
-skinparam linetype ortho
-skinparam ArrowThickness 1
-
-title plantuml-plugin-manorfm v0.11.7 — architecture (this repo)
+title plantuml-plugin — plain + pipeline da extensão (pode aplicar)
 
 left to right direction
 
@@ -67,8 +59,7 @@ EXP --> CEP : active doc
 SC --> SRV : GET / POST
 
 legend bottom
-  Modes: code only | split | diagram only — mesmo separador; **viewModes** no workspace.
-  Encoder npm: **plantuml-encoder** (deflate + base64).
+  Compara com **architecture.puml**: lá há nodesep/ranksep/… → pipeline automático desligado.
 endlegend
 
 @enduml

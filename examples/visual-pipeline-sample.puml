@@ -1,0 +1,19 @@
+@startuml
+title Sample for visual pipeline (sequence)
+
+actor User
+participant "API Gateway" as Api
+database Postgres
+
+User -> Api: GET /items
+Api -> Postgres: SELECT
+Postgres --> Api: rows
+Api --> User: 200 JSON
+
+@enduml
+
+' With default settings (Settings → PlantUML Viewer):
+' - visualTheme: modern-dark → skinparam spacing + semantic hints
+' - SVG post-processing adds soft shadow + hover CSS
+'
+' Use plantumlViewer.visualTheme = "none" for plain server styling only.

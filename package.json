@@ -3,7 +3,7 @@
   "displayName": "PlantUML Plugin",
   "description": "Edit and preview PlantUML diagrams in VS Code: split view, live SVG, PNG/SVG export. Diagrams are rendered by your chosen PlantUML server.",
   "icon": "media/icon.png",
-  "version": "0.10.12",
+  "version": "0.11.7",
   "publisher": "manorfm",
   "license": "MIT",
   "repository": {
@@ -212,6 +212,27 @@
           "type": "boolean",
           "default": true,
           "description": "Show Mode / Refresh / Export controls in the top-right of the custom editor webview."
+        },
+        "plantumlViewer.visualTheme": {
+          "type": "string",
+          "enum": [
+            "none",
+            "modern-dark",
+            "glass",
+            "minimal"
+          ],
+          "default": "modern-dark",
+          "description": "Visual pipeline: soft harmonious skinparams, stereotype accents, SVG polish. Default theme (modern-dark) uses a light, modern palette. Use \"none\" for plain server output only."
+        },
+        "plantumlViewer.visualSemanticColors": {
+          "type": "boolean",
+          "default": true,
+          "description": "When the visual theme is active, add semantic skinparam hints from keywords (e.g. user, API, database)."
+        },
+        "plantumlViewer.visualSvgEnhancements": {
+          "type": "boolean",
+          "default": true,
+          "description": "After rendering, inject SVG defs (shadows, gradients) and light CSS for hover polish."
         }
       }
     }
@@ -222,7 +243,7 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile",
     "test": "node ./dist/test/runTest.js",
-    "test:coverage:unit": "npm run compile && c8 node ./node_modules/mocha/bin/mocha --ui tdd --timeout 10000 dist/test/suite/abortSignal.test.js dist/test/suite/customEditorHtml.test.js dist/test/suite/debounce.test.js dist/test/suite/diagramSvgCache.test.js dist/test/suite/formatPlantuml.test.js dist/test/suite/html.test.js dist/test/suite/plantumlConnectionSettings.test.js dist/test/suite/previewZoomWheel.test.js dist/test/suite/serverClient.test.js dist/test/suite/sourceTransform.test.js dist/test/suite/webviewHighlight.test.js",
+    "test:coverage:unit": "npm run compile && c8 node ./node_modules/mocha/bin/mocha --ui tdd --timeout 10000 dist/test/suite/abortSignal.test.js dist/test/suite/customEditorHtml.test.js dist/test/suite/debounce.test.js dist/test/suite/diagramSvgCache.test.js dist/test/suite/formatPlantuml.test.js dist/test/suite/html.test.js dist/test/suite/plantumlConnectionSettings.test.js dist/test/suite/previewZoomWheel.test.js dist/test/suite/serverClient.test.js dist/test/suite/sourceTransform.test.js dist/test/suite/visualRendering.test.js dist/test/suite/webviewHighlight.test.js",
     "vscode:package": "vsce package",
     "vsix": "npm run compile && vsce package",
     "lint": "eslint src --ext ts"
@@ -248,9 +269,9 @@
     "reporter": ["text", "lcov"],
     "report-dir": "coverage",
     "check-coverage": true,
-    "lines": 92,
-    "functions": 99,
-    "branches": 78,
-    "statements": 92
+    "lines": 90,
+    "functions": 98,
+    "branches": 74,
+    "statements": 90
   }
 }

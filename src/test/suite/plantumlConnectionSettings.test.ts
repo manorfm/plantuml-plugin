@@ -12,6 +12,9 @@ suite("plantuml/plantumlConnectionSettings — normalizePlantumlViewerSettings",
   test("serverUrl vazio usa URL por defeito", () => {
     const c = normalizePlantumlViewerSettings({});
     assert.strictEqual(c.serverUrl, DEFAULT_PLANTUML_SERVER_URL);
+    assert.strictEqual(c.visualTheme, "modern-dark");
+    assert.strictEqual(c.visualSemanticColors, true);
+    assert.strictEqual(c.visualSvgEnhancements, true);
   });
 
   test("serverUrl com espaços é trimado; vazio → defeito", () => {

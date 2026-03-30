@@ -1,22 +1,11 @@
 @startuml
-' Variantes do mesmo diagrama (comparar temas): architecture-theme-plain-pipeline.puml,
-' architecture-theme-cerulean-outline.puml, architecture-theme-plain-layout-manual.puml
-' !theme = só temas do motor PlantUML (https://plantuml.com/theme), ex. plain.
-' Nunca: modern-dark, glass, minimal, none — esses valores são só em Settings (plantumlViewer.visualTheme).
-!theme plain
-skinparam shadowing false
-skinparam roundcorner 10
-skinparam defaultFontName Verdana
+' === Variante B: tema do SERVIDOR PlantUML (não é o visualTheme da extensão) ===
+' Estilo vem do motor; a extensão NÃO antepõe o bloco automático de skinparams
+' (evita misturar com o tema do servidor).
+' Lista: https://plantuml.com/theme
+!theme cerulean-outline
 
-' Layout: mais espaço entre nós e pacotes (diagramas densos)
-skinparam nodesep 100
-skinparam ranksep 85
-skinparam packagePadding 26
-skinparam componentPadding 14
-skinparam linetype ortho
-skinparam ArrowThickness 1
-
-title plantuml-plugin-manorfm v0.11.7 — architecture (this repo)
+title plantuml — cerulean-outline (só servidor)
 
 left to right direction
 
@@ -67,8 +56,7 @@ EXP --> CEP : active doc
 SC --> SRV : GET / POST
 
 legend bottom
-  Modes: code only | split | diagram only — mesmo separador; **viewModes** no workspace.
-  Encoder npm: **plantuml-encoder** (deflate + base64).
+  Troca **cerulean-outline** por outro nome da lista oficial (ex.: **metal**, **materia**) e re-renderiza.
 endlegend
 
 @enduml

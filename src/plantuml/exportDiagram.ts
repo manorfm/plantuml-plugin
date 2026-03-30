@@ -5,7 +5,7 @@ import { isPlantumlEditorDocument } from "../util/plantumlEditor";
 import { PlantumlCustomEditorProvider } from "./plantumlCustomEditorProvider";
 import { expandPlantUmlIncludes } from "./expandIncludes";
 import { fetchPngDiagram, fetchSvgDiagram, type FetchSvgOptions } from "./serverClient";
-import { applyDiagramPreamble } from "./sourceTransform";
+import { enhanceSvgString, prepareUmlForServer } from "./rendering/renderPipeline";
 
 export type ExportFormat = "svg" | "png";
 
@@ -38,7 +38,14 @@ export async function exportActivePlantUmlDiagram(
   text = expanded.text;
 
   const cfgFull = getConfig();
-  text = applyDiagramPreamble(text, cfgFull.diagramPreamble);
+  const visualInput = {
+    theme: cfgFull.visualTheme,
+    semanticColors: cfgFull.visualSemanticColors,
+    svgEnhancements: cfgFull.visualSvgEnhancements,
+  };
+  const prepared = prepareUmlForServer(text, cfgFull.diagramPreamble, visualInput);
+  text = prepared.text;
+  const diagramKind = prepared.kind;
 
   const baseName = path.basename(uri.fsPath, path.extname(uri.fsPath));
   const ext = format === "svg" ? "svg" : "png";
@@ -67,8 +74,9 @@ export async function exportActivePlantUmlDiagram(
       void vscode.window.showErrorMessage(result.message);
       return;
     }
+    const svgOut = enhanceSvgString(result.svg, diagramKind, visualInput);
     const enc = new TextEncoder();
-    await vscode.workspace.fs.writeFile(target, enc.encode(result.svg));
+    await vscode.workspace.fs.writeFile(target, enc.encode(svgOut));
   } else {
     const result = await fetchPngDiagram(serverUrl, text, opts);
     if (result.kind === "error") {

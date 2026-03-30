@@ -3,6 +3,9 @@ import {
   PREVIEW_ZOOM_MIN,
 } from "../constants/previewZoomLimits";
 import { DEFAULT_PLANTUML_SERVER_URL } from "./serverClient";
+import type { VisualThemeId } from "./rendering/themes";
+
+export type { VisualThemeId } from "./rendering/themes";
 
 export type PlantumlConnectionConfig = {
   serverUrl: string;
@@ -23,6 +26,12 @@ export type PlantumlConnectionConfig = {
   showModeCodeLens: boolean;
   /** Toolbar inside the custom editor webview (top-right). */
   showWebviewToolbar: boolean;
+  /** Pipeline visual: `none` desactiva préâmbulo automático e pós-processamento por defeito. */
+  visualTheme: VisualThemeId;
+  /** Cores semânticas (heurísticas) no préâmbulo automático. */
+  visualSemanticColors: boolean;
+  /** Filtros / CSS no SVG após o render. */
+  visualSvgEnhancements: boolean;
 };
 
 /**
@@ -39,6 +48,9 @@ export type RawPlantumlViewerSettings = {
   showStatusBarActions?: boolean;
   showModeCodeLens?: boolean;
   showWebviewToolbar?: boolean;
+  visualTheme?: string;
+  visualSemanticColors?: boolean;
+  visualSvgEnhancements?: boolean;
 };
 
 export function normalizePlantumlViewerSettings(
@@ -58,6 +70,10 @@ export function normalizePlantumlViewerSettings(
   }
   autoRefreshDelayMs = Math.min(30_000, Math.max(50, Math.round(autoRefreshDelayMs)));
 
+  const visualTheme = parseVisualTheme(raw.visualTheme);
+  const visualSemanticColors = raw.visualSemanticColors ?? true;
+  const visualSvgEnhancements = raw.visualSvgEnhancements ?? true;
+
   return {
     serverUrl: trimmed.length === 0 ? DEFAULT_PLANTUML_SERVER_URL : trimmed,
     requestTimeoutMs:
@@ -71,5 +87,21 @@ export function normalizePlantumlViewerSettings(
     showStatusBarActions: raw.showStatusBarActions ?? true,
     showModeCodeLens: raw.showModeCodeLens ?? false,
     showWebviewToolbar: raw.showWebviewToolbar ?? true,
+    visualTheme,
+    visualSemanticColors,
+    visualSvgEnhancements,
   };
+}
+
+function parseVisualTheme(raw: unknown): VisualThemeId {
+  const s = typeof raw === "string" ? raw.trim().toLowerCase() : "";
+  if (
+    s === "none" ||
+    s === "modern-dark" ||
+    s === "glass" ||
+    s === "minimal"
+  ) {
+    return s;
+  }
+  return "modern-dark";
 }

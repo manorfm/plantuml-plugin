@@ -35,7 +35,7 @@ Permitir **visualizar e exportar** diagramas PlantUML a partir do editor, com UI
 ### 1.2 Limitações (nível global)
 
 - **URL por defeito** do servidor: uso previsto para diagramas **não confidenciais**; conteúdo sensível exige servidor **local** (ver spec `plantuml-server-client` e README).
-- Estilo **dentro** do SVG gerado pelo motor PlantUML não é forçado pelo tema do editor.
+- O **tema do editor** VS Code não altera o motor PlantUML; opcionalmente, a extensão aplica um **pipeline visual** (préâmbulo `skinparam` + pós-processamento SVG) configurável — ver `specs/visual-rendering-pipeline/` e `docs/visual-rendering.md`.
 - `diagramPreamble` e `!theme` dependem das capacidades do **servidor**.
 - Servidores muito antigos podem falhar em diagramas extremamente grandes mesmo com POST.
 
@@ -70,6 +70,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | HTTP, encoding, erros de rede | `specs/plantuml-server-client/` |
 | `!include`, préâmbulo | `specs/source-preparation/` |
 | Webview, tema, zoom, pan, loading | `specs/preview-rendering/` |
+| Pipeline visual (temas, SVG, semântica) | `specs/visual-rendering-pipeline/` |
 | Zoom interactivo com roda na área do diagrama | `specs/diagram-wheel-zoom/` |
 | Modos, persistência, foco | `specs/view-modes/` |
 | Exportação ficheiro | `specs/export-diagram/` |
@@ -97,6 +98,7 @@ Comandos, linguagem, extensões de ficheiro, ícones da barra e chaves `plantuml
 | `specs/plantuml-server-client/` | Cliente HTTP PlantUML |
 | `specs/source-preparation/` | Preparação do texto (`!include`, préâmbulo) |
 | `specs/preview-rendering/` | Pré-visualização Webview |
+| `specs/visual-rendering-pipeline/` | Pipeline visual (temas, pós-processamento SVG) |
 | `specs/diagram-wheel-zoom/` | Zoom com roda do rato no diagrama |
 | `specs/view-modes/` | Modos de vista |
 | `specs/export-diagram/` | Exportação SVG/PNG |

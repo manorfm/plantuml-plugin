@@ -2,7 +2,10 @@ import * as vscode from "vscode";
 import { getPlantumlCustomEditorShellHtml } from "./customEditorHtml";
 import { expandPlantUmlIncludesCached } from "./expandIncludes";
 import { fetchSvgDiagram } from "./serverClient";
-import { applyDiagramPreamble } from "./sourceTransform";
+import {
+  enhanceSvgString,
+  prepareUmlForServer,
+} from "./rendering/renderPipeline";
 import {
   invalidatePlantumlConfigCache,
   PREVIEW_ZOOM_MAX,
@@ -455,22 +458,31 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
       });
       return;
     }
-    text = expanded.text;
-    text = applyDiagramPreamble(text, conn.diagramPreamble);
+    const visualInput = {
+      theme: conn.visualTheme,
+      semanticColors: conn.visualSemanticColors,
+      svgEnhancements: conn.visualSvgEnhancements,
+    };
+    const { text: serverText, kind } = prepareUmlForServer(
+      expanded.text,
+      conn.diagramPreamble,
+      visualInput
+    );
 
     this.abort?.abort();
     this.abort = new AbortController();
     const signal = this.abort.signal;
 
-    const cacheKey = diagramCacheKey(conn.serverUrl, text);
+    const cacheKey = diagramCacheKey(conn.serverUrl, serverText);
     const cached = getCachedDiagram(cacheKey);
     if (cached) {
       if (cached.kind === "svg") {
+        const svg = enhanceSvgString(cached.svg, kind, visualInput);
         this.webview.postMessage({
           type: "diagram",
           kind: "html",
           html: buildDiagramMountContent(
-            { svg: cached.svg },
+            { svg },
             { previewZoom: conn.previewZoom }
           ),
         });
@@ -495,7 +507,7 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
       });
     }
 
-    const result = await fetchSvgDiagram(conn.serverUrl, text, {
+    const result = await fetchSvgDiagram(conn.serverUrl, serverText, {
       signal,
       timeoutMs: conn.requestTimeoutMs,
     });
@@ -506,11 +518,12 @@ class PlantumlCustomEditorSession implements vscode.Disposable {
 
     if (result.kind === "svg") {
       setCachedDiagram(cacheKey, { kind: "svg", svg: result.svg });
+      const svg = enhanceSvgString(result.svg, kind, visualInput);
       this.webview.postMessage({
         type: "diagram",
         kind: "html",
         html: buildDiagramMountContent(
-          { svg: result.svg },
+          { svg },
           { previewZoom: conn.previewZoom }
         ),
       });

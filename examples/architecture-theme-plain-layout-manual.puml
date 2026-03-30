@@ -1,14 +1,13 @@
 @startuml
-' Variantes do mesmo diagrama (comparar temas): architecture-theme-plain-pipeline.puml,
-' architecture-theme-cerulean-outline.puml, architecture-theme-plain-layout-manual.puml
-' !theme = só temas do motor PlantUML (https://plantuml.com/theme), ex. plain.
-' Nunca: modern-dark, glass, minimal, none — esses valores são só em Settings (plantumlViewer.visualTheme).
+' === Variante C: igual ao repo principal architecture.puml ===
+' !theme plain + skinparam de layout (nodesep, ranksep, …) →
+' o plugin NÃO injecta nodesep/ranksep/linetype automáticos, mas injecta CORES, bordas e estereótipos
+' (bloco inserido depois desta linha !theme). shadowing/font/roundcorner abaixo sobrepõem o bloco.
 !theme plain
 skinparam shadowing false
 skinparam roundcorner 10
 skinparam defaultFontName Verdana
 
-' Layout: mais espaço entre nós e pacotes (diagramas densos)
 skinparam nodesep 100
 skinparam ranksep 85
 skinparam packagePadding 26
@@ -16,7 +15,7 @@ skinparam componentPadding 14
 skinparam linetype ortho
 skinparam ArrowThickness 1
 
-title plantuml-plugin-manorfm v0.11.7 — architecture (this repo)
+title plantuml-plugin — plain + layout manual (cores do plugin + overrides locais)
 
 left to right direction
 
@@ -67,8 +66,7 @@ EXP --> CEP : active doc
 SC --> SRV : GET / POST
 
 legend bottom
-  Modes: code only | split | diagram only — mesmo separador; **viewModes** no workspace.
-  Encoder npm: **plantuml-encoder** (deflate + base64).
+  Este ficheiro espelha **architecture.puml**: mesmo significado de “plain + layout manual”.
 endlegend
 
 @enduml

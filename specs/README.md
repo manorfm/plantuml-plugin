@@ -26,6 +26,7 @@ Alterações de comportamento devem **actualizar primeiro** o `spec.md` (ou o gl
 | [`view-modes/`](./view-modes/) | Três modos de vista, persistência, foco e barra do editor. |
 | [`export-diagram/`](./export-diagram/) | Exportação SVG/PNG para ficheiro. |
 | [`engineering-release/`](./engineering-release/) | Testes, empacotamento `.vsix`, SemVer e coerência de documentação. |
+| [`visual-rendering-pipeline/`](./visual-rendering-pipeline/) | Pipeline visual: análise do diagrama, temas, préâmbulo, pós-processamento SVG. |
 | [`plantuml-text-editor/`](./plantuml-text-editor/) | Realce de sintaxe TextMate, formatação/indentação, script `vsix`. |
 
 ## Convenções de nomes

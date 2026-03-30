@@ -9,6 +9,7 @@ export type {
   PlantumlConnectionConfig,
   RawPlantumlViewerSettings,
 } from "./plantuml/plantumlConnectionSettings";
+export type { VisualThemeId } from "./plantuml/plantumlConnectionSettings";
 export { normalizePlantumlViewerSettings } from "./plantuml/plantumlConnectionSettings";
 
 let cachedConfig: PlantumlConnectionConfig | undefined;
@@ -29,6 +30,9 @@ function readPlantumlConfigUncached(): PlantumlConnectionConfig {
     showStatusBarActions: cfg.get<boolean>("showStatusBarActions", true),
     showModeCodeLens: cfg.get<boolean>("showModeCodeLens", false),
     showWebviewToolbar: cfg.get<boolean>("showWebviewToolbar", true),
+    visualTheme: cfg.get<string>("visualTheme", "modern-dark"),
+    visualSemanticColors: cfg.get<boolean>("visualSemanticColors", true),
+    visualSvgEnhancements: cfg.get<boolean>("visualSvgEnhancements", true),
   });
 }
 
